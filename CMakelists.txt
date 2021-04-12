@@ -1,0 +1,51 @@
+cmake_minimum_required(VERSION 3.13)
+project(Chocolate-Wolfenstein-3D)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED YES)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+set(CXX_FLAGS "-O2 \
+              -Wpointer-arith \
+              -Wreturn-type \
+              -Wwrite-strings \
+              -Wcast-align \
+              -Werror-implicit-function-declaration \
+              -Wimplicit-int \
+              -Wsequence-point")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} ${CXX_FLAGS}")
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
+find_package(SDL2 REQUIRED)
+find_package(SDL2_mixer REQUIRED)
+include_directories(${SDL2_MIXER_INCLUDE_DIR})
+
+set(SOURCE_FILES src/fmopl.cpp
+                 src/id_ca.cpp
+                 src/id_in.cpp
+                 src/id_pm.cpp
+                 src/id_sd.cpp
+                 src/id_us_1.cpp
+                 src/id_vh.cpp
+                 src/id_vl.cpp
+                 src/signon.cpp
+                 src/wl_act1.cpp
+                 src/wl_act2.cpp
+                 src/wl_agent.cpp
+                 src/wl_debug.cpp
+                 src/wl_draw.cpp
+                 src/wl_game.cpp
+                 src/wl_inter.cpp
+                 src/wl_main.cpp
+                 src/wl_menu.cpp
+                 src/wl_play.cpp
+                 src/wl_state.cpp
+                 src/wl_text.cpp
+                 src/crt.cpp)
+
+add_executable(Chocolate-Wolfenstein-3D ${SOURCE_FILES})
+target_link_libraries(Chocolate-Wolfenstein-3D PRIVATE SDL2::SDL2 ${SDL2_MIXER_LIBRARIES})
+
+add_custom_command(TARGET Chocolate-Wolfenstein-3D PRE_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory
+                   ${CMAKE_SOURCE_DIR}/data/ $<TARGET_FILE_DIR:Chocolate-Wolfenstein-3D>)

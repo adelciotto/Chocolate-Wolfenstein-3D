@@ -1,29 +1,21 @@
 Chocolate-Wolfenstein-3D
 ========================
 
-Based on Wolf4SDL by Moritz "Ripper" Kroll (http://www.chaos-software.de.vu).
+![alt tag](screenshots/crt_aspect.png)
 
-Original Wolfenstein 3D by id Software (http://www.idsoftware.com)
+This is a fork of Fabien Sanglard's [Chocolate-Wolfenstein-3D](https://github.com/fabiensanglard/Chocolate-Wolfenstein-3D) which upgrades the codebase to use SDL2 and makes some
+other small changes.
 
-Chocolate Wolf3D removes all the crap that was added over the years 
-(snow, rain ...) in order to recreate the experience from 1993. 
+* Now using CMake for cross-platform builds.
+* Replaces OpenGL code with the SDL2 renderer for CRT emulation.
 
-All other port display the framebuffer as 320x200 without accounting for the CRT 4:3
-distortion. Chocolate Wolfenstein 3D has a CRT emulator based on OpenGL:
+This is still a WIP. Things I'm planning to do:
+- [ ] Detailed instructions for how to build for each platform (via command line, and CLion IDE).
+- [ ] Replace Joystick API with the new GameController API.
+- [ ] Ports to game consoles (PSP, PS Vita, etc).
 
-Direct framebuffer to window (resulting in compressed image):
+## Credits
 
-![alt tag](https://github.com/fabiensanglard/Chocolate-Wolfenstein-3D/blob/master/screenshots/crt_framebuffer.png)
-
-CRT 4:3 aspect ratio emulated to match what gamer saw on their screen in 1993. Image is streched to 320x240 just
-like the CRT did :
-
-![alt tag](https://github.com/fabiensanglard/Chocolate-Wolfenstein-3D/blob/master/screenshots/crt_aspect.png)
-
-Tested on Windows, Linux and Mac OS X
-
-Step by Step Mac OS X setup here: http://clubctrl.com/org/prog/wolf.html
-
-Windows Visual Studio 2013 setup here: http://richardssoftware.net/Home/Post/64
-
-Fabien Sanglard 
+* [Fabien Sanglard](https://fabiensanglard.net/) for original [Chocolate-Wolfenstein-3D](https://github.com/fabiensanglard/Chocolate-Wolfenstein-3D).
+* Based on Wolf4SDL by Moritz "Ripper" Kroll (http://www.chaos-software.de.vu).
+* Original Wolfenstein 3D by id Software (http://www.idsoftware.com).

@@ -19,6 +19,10 @@ void Quit (const char *error,...);
 
 //===========================================================================
 
+extern SDL_Window *sdlWindow;
+extern SDL_Renderer *sdlRenderer;
+extern SDL_Texture *sdlTexture;
+extern SDL_Palette *sdlPalette;
 extern SDL_Surface *screen, *screenBuffer, *curSurface;
 
 extern  boolean  fullscreen, usedoublebuffering;

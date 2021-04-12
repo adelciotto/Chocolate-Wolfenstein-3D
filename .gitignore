@@ -1,11 +1,10 @@
-*/DerivedData/*
 .DS_Store
-xcuserdata
 
-#visual studio files
-*.sdf
-*.suo
-*.vcxproj.user
-Debug
-Release
-Backup
+#data files
+data/**
+!**/.gitkeep
+
+#cmake/clion files and directories
+.idea
+cmake-build-debug
+cmake-build-release
