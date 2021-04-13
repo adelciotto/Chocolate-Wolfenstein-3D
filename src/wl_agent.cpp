@@ -181,6 +181,29 @@ void ControlMovement(objtype *ob)
             Thrust(angle, BASEMOVE * MOVESCALE * tics);
     }
 
+    if (controlstrafe < 0)
+    {
+        angle = ob->angle + ANGLES / 4;
+        if (angle >= ANGLES)
+            angle -= ANGLES;
+
+        int32_t speed = -controlstrafe * MOVESCALE;
+        if (controly != 0)
+            speed = (speed * 70) / 100; // correct faster diagonal movement
+        Thrust(angle, speed);           // move to left
+    }
+    else if (controlstrafe > 0)
+    {
+        angle = ob->angle - ANGLES / 4;
+        if (angle < 0)
+            angle += ANGLES;
+
+        int32_t speed = controlstrafe * MOVESCALE;
+        if (controly != 0)
+            speed = (speed * 70) / 100; // correct faster diagonal movement
+        Thrust(angle, speed);           // move to right
+    }
+
     //
     // side to side move
     //
@@ -226,14 +249,21 @@ void ControlMovement(objtype *ob)
     //
     if (controly < 0)
     {
-        Thrust(ob->angle, -controly * MOVESCALE); // move forwards
+        int32_t speed = -controly * MOVESCALE;
+        if (controlstrafe != 0)
+            speed = (speed * 70) / 100; // correct faster diagonal movement
+        Thrust(ob->angle, speed);       // move forwards
     }
     else if (controly > 0)
     {
         angle = ob->angle + ANGLES / 2;
         if (angle >= ANGLES)
             angle -= ANGLES;
-        Thrust(angle, controly * BACKMOVESCALE); // move backwards
+
+        int32_t speed = controly * BACKMOVESCALE;
+        if (controlstrafe != 0)
+            speed = (speed * 70) / 100; // correct faster diagonal movement
+        Thrust(angle, speed);           // move backwards
     }
 
     if (gamestate.victoryflag) // watching the BJ actor

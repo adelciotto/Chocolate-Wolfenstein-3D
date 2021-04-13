@@ -57,6 +57,13 @@ static SDL_Joystick *Joystick;
 int JoyNumButtons;
 static int JoyNumHats;
 
+bool GameControllerButtons[gcbt_Max];
+int GameControllerLeftStickX = 0;
+int GameControllerLeftStickY = 0;
+int GameControllerRightStickX = 0;
+int GameControllerRightStickY = 0;
+static SDL_GameController *GameController = nullptr;
+
 static bool GrabInput = false;
 
 /*
@@ -350,6 +357,52 @@ static void processEvent(SDL_Event *event)
         }
         break;
     }
+
+    // check for game controller events
+    case SDL_CONTROLLERDEVICEADDED: {
+        if (!GameController)
+        {
+            int id = event->cdevice.which;
+            if (SDL_IsGameController(id))
+            {
+                GameController = SDL_GameControllerOpen(id);
+            }
+        }
+        break;
+    }
+    case SDL_CONTROLLERDEVICEREMOVED: {
+        if (GameController)
+        {
+            SDL_GameControllerClose(GameController);
+            GameController = nullptr;
+        }
+        break;
+    }
+    case SDL_CONTROLLERBUTTONDOWN:
+    case SDL_CONTROLLERBUTTONUP:
+        if (GameController)
+        {
+            GameControllerButtons[event->cbutton.button] = (bool)event->cbutton.state == SDL_PRESSED;
+        }
+        break;
+    case SDL_CONTROLLERAXISMOTION:
+        if (GameController)
+        {
+            if (event->caxis.axis == SDL_CONTROLLER_AXIS_LEFTX)
+                GameControllerLeftStickX = event->caxis.value >> 8;
+            if (event->caxis.axis == SDL_CONTROLLER_AXIS_LEFTY)
+                GameControllerLeftStickY = event->caxis.value >> 8;
+            if (event->caxis.axis == SDL_CONTROLLER_AXIS_RIGHTX)
+                GameControllerRightStickX = event->caxis.value >> 8;
+            if (event->caxis.axis == SDL_CONTROLLER_AXIS_RIGHTY)
+                GameControllerRightStickY = event->caxis.value >> 8;
+
+            if (event->caxis.axis == SDL_CONTROLLER_AXIS_TRIGGERLEFT)
+                GameControllerButtons[gcbt_LeftShoulder] = event->caxis.value == 32767;
+            if (event->caxis.axis == SDL_CONTROLLER_AXIS_TRIGGERRIGHT)
+                GameControllerButtons[gcbt_RightShoulder] = event->caxis.value == 32767;
+        }
+        break;
     }
 }
 
@@ -388,15 +441,18 @@ void IN_Startup(void)
 
     if (param_joystickindex >= 0 && param_joystickindex < SDL_NumJoysticks())
     {
-        Joystick = SDL_JoystickOpen(param_joystickindex);
-        if (Joystick)
+        if (!SDL_IsGameController(param_joystickindex))
         {
-            JoyNumButtons = SDL_JoystickNumButtons(Joystick);
-            if (JoyNumButtons > 32)
-                JoyNumButtons = 32; // only up to 32 buttons are supported
-            JoyNumHats = SDL_JoystickNumHats(Joystick);
-            if (param_joystickhat < -1 || param_joystickhat >= JoyNumHats)
-                Quit("The joystickhat param must be between 0 and %i!", JoyNumHats - 1);
+            Joystick = SDL_JoystickOpen(param_joystickindex);
+            if (Joystick)
+            {
+                JoyNumButtons = SDL_JoystickNumButtons(Joystick);
+                if (JoyNumButtons > 32)
+                    JoyNumButtons = 32; // only up to 32 buttons are supported
+                JoyNumHats = SDL_JoystickNumHats(Joystick);
+                if (param_joystickhat < -1 || param_joystickhat >= JoyNumHats)
+                    Quit("The joystickhat param must be between 0 and %i!", JoyNumHats - 1);
+            }
         }
     }
 
@@ -426,6 +482,9 @@ void IN_Shutdown(void)
 
     if (Joystick)
         SDL_JoystickClose(Joystick);
+
+    if (GameController)
+        SDL_GameControllerClose(GameController);
 
     IN_Started = false;
 }
@@ -460,6 +519,33 @@ void IN_ReadControl(int player, ControlInfo *info)
 
     IN_ProcessEvents();
 
+    // read input from the game controller
+    if (GameControllerButtons[gcbt_DpadUp])
+        my = motion_Up;
+    else if (GameControllerButtons[gcbt_DpadDown])
+        my = motion_Down;
+
+    if (GameControllerButtons[gcbt_DpadLeft])
+        mx = motion_Left;
+    else if (GameControllerButtons[gcbt_DpadRight])
+        my = motion_Right;
+
+    if (GameControllerLeftStickY < -SENSITIVE)
+        my = motion_Up;
+    else if (GameControllerLeftStickY > SENSITIVE)
+        my = motion_Down;
+
+    if (GameControllerLeftStickX < -SENSITIVE)
+        mx = motion_Left;
+    else if (GameControllerLeftStickX > SENSITIVE)
+        mx = motion_Right;
+
+    if (GameControllerButtons[gcbt_Start] || GameControllerButtons[gcbt_A])
+        buttons += 1 << 0;
+    if (GameControllerButtons[gcbt_Back] || GameControllerButtons[gcbt_B])
+        buttons += 1 << 1;
+
+    // read input from the keyboard
     if (Keyboard[KbdDefs.upleft])
         mx = motion_Left, my = motion_Up;
     else if (Keyboard[KbdDefs.upright])
@@ -514,6 +600,7 @@ void IN_StartAck(void)
     // get initial state of everything
     //
     IN_ClearKeysDown();
+    memset(GameControllerButtons, 0, sizeof(bool));
     memset(btnstate, 0, sizeof(btnstate));
 
     int buttons = IN_JoyButtons() << 4;
@@ -534,6 +621,12 @@ boolean IN_CheckAck(void)
     //
     if (LastScan)
         return true;
+
+    for (int i = 0; i < gcbt_Max; i++)
+    {
+        if (GameControllerButtons[i])
+            return true;
+    }
 
     int buttons = IN_JoyButtons() << 4;
 

@@ -50,6 +50,10 @@ unsigned tics;
 boolean mouseenabled, joystickenabled;
 int dirscan[4] = {sc_UpArrow, sc_RightArrow, sc_DownArrow, sc_LeftArrow};
 int buttonscan[NUMBUTTONS] = {sc_Control, sc_Alt, sc_LShift, sc_Space, sc_1, sc_2, sc_3, sc_4};
+int buttongamecontroller[gcbt_Max] = {bt_use,      bt_prevweapon, bt_nobutton, bt_nextweapon, bt_pause,    bt_nobutton,
+                                      bt_esc,      bt_nobutton,   bt_nobutton, bt_run,        bt_attack,   bt_nobutton,
+                                      bt_nobutton, bt_nobutton,   bt_nobutton, bt_nobutton,   bt_nobutton, bt_nobutton,
+                                      bt_nobutton, bt_nobutton,   bt_nobutton};
 int buttonmouse[4] = {bt_attack, bt_strafe, bt_use, bt_nobutton};
 int buttonjoy[32] = {
 
@@ -71,6 +75,7 @@ memptr demobuffer;
 // current user input
 //
 int controlx, controly; // range from -100 to 100 per tic
+int controlstrafe;
 boolean buttonstate[NUMBUTTONS];
 
 int lastgamemusicoffset = 0;
@@ -242,6 +247,28 @@ void PollJoystickButtons(void)
 /*
 ===================
 =
+= PollGameControllerButtons
+=
+===================
+*/
+
+void PollGameControllerButtons(void)
+{
+    int i;
+
+    for (i = 0; i < gcbt_Max; i++)
+    {
+        if (GameControllerButtons[i])
+        {
+            if (buttongamecontroller[i] != -1)
+                buttonstate[buttongamecontroller[i]] = true;
+        }
+    }
+}
+
+/*
+===================
+=
 = PollKeyboardMove
 =
 ===================
@@ -259,6 +286,34 @@ void PollKeyboardMove(void)
         controlx -= delta;
     if (Keyboard[dirscan[di_east]])
         controlx += delta;
+}
+
+/*
+===================
+=
+= PollGameControllerMove
+=
+===================
+*/
+
+void PollGameControllerMove(void)
+{
+    int delta = buttonstate[bt_run] ? RUNMOVE * tics : BASEMOVE * tics;
+
+    if (GameControllerRightStickX > 64)
+        controlx += delta;
+    else if (GameControllerRightStickX < -64)
+        controlx -= delta;
+
+    if (GameControllerLeftStickY > 64)
+        controly += delta;
+    else if (GameControllerLeftStickY < -64)
+        controly -= delta;
+
+    if (GameControllerLeftStickX > 64)
+        controlstrafe += delta;
+    else if (GameControllerLeftStickX < -64)
+        controlstrafe -= delta;
 }
 
 /*
@@ -348,6 +403,7 @@ void PollControls(void)
 
     controlx = 0;
     controly = 0;
+    controlstrafe = 0;
     memcpy(buttonheld, buttonstate, sizeof(buttonstate));
     memset(buttonstate, 0, sizeof(buttonstate));
 
@@ -379,6 +435,7 @@ void PollControls(void)
     // get button states
     //
     PollKeyboardButtons();
+    PollGameControllerButtons();
 
     if (mouseenabled && IN_IsInputGrabbed())
         PollMouseButtons();
@@ -390,6 +447,7 @@ void PollControls(void)
     // get movements
     //
     PollKeyboardMove();
+    PollGameControllerMove();
 
     if (mouseenabled && IN_IsInputGrabbed())
         PollMouseMove();
@@ -411,6 +469,11 @@ void PollControls(void)
         controly = max;
     else if (controly < min)
         controly = min;
+
+    if (controlstrafe > max)
+        controlstrafe = max;
+    else if (controlstrafe < min)
+        controlstrafe = min;
 
     if (demorecord)
     {

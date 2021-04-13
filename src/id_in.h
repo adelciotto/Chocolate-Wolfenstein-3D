@@ -148,7 +148,28 @@ typedef struct
 } JoystickDef;
 // Global variables
 extern volatile boolean Keyboard[];
-;
+
+#define gcbt_None SDL_CONTROLLER_BUTTON_INVALID
+#define gcbt_A SDL_CONTROLLER_BUTTON_A
+#define gcbt_B SDL_CONTROLLER_BUTTON_B
+#define gcbt_X SDL_CONTROLLER_BUTTON_X
+#define gcbt_Y SDL_CONTROLLER_BUTTON_Y
+#define gcbt_Back SDL_CONTROLLER_BUTTON_BACK
+#define gcbt_Guide SDL_CONTROLLER_BUTTON_GUIDE
+#define gcbt_Start SDL_CONTROLLER_BUTTON_START
+#define gcbt_LeftStick SDL_CONTROLLER_BUTTON_LEFTSTICK
+#define gcbt_RightStick SDL_CONTROLLER_BUTTON_RIGHTSTICK
+#define gcbt_LeftShoulder SDL_CONTROLLER_BUTTON_LEFTSHOULDER
+#define gcbt_RightShoulder SDL_CONTROLLER_BUTTON_RIGHTSHOULDER
+#define gcbt_DpadUp SDL_CONTROLLER_BUTTON_DPAD_UP
+#define gcbt_DpadDown SDL_CONTROLLER_BUTTON_DPAD_DOWN
+#define gcbt_DpadLeft SDL_CONTROLLER_BUTTON_DPAD_LEFT
+#define gcbt_DpadRight SDL_CONTROLLER_BUTTON_DPAD_RIGHT
+#define gcbt_Max SDL_CONTROLLER_BUTTON_MAX
+extern bool GameControllerButtons[gcbt_Max];
+extern int GameControllerLeftStickX, GameControllerLeftStickY;
+extern int GameControllerRightStickX, GameControllerRightStickY;
+
 extern boolean MousePresent;
 extern volatile boolean Paused;
 extern volatile char LastASCII;

@@ -1091,7 +1091,7 @@ static void InitGame()
 #if defined _WIN32
     putenv("SDL_VIDEODRIVER=directx");
 #endif
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER) < 0)
     {
         printf("Unable to init SDL: %s\n", SDL_GetError());
         exit(1);

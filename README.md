@@ -8,10 +8,11 @@ other small changes.
 
 * Now using CMake for cross-platform builds.
 * Replaces OpenGL code with the SDL2 renderer for CRT emulation.
+* Support for modern game controllers (Xbox, PS3/PS4, etc) via the SDL2 GameController API.
+    * When using a modern game controller, the game supports moving and strafing at the same time. 
 
 This is still a WIP. Things I'm planning to do:
 - [ ] Detailed instructions for how to build for each platform (via command line, and CLion IDE).
-- [ ] Replace Joystick API with the new GameController API.
 - [ ] Ports to game consoles (PSP, PS Vita, etc).
 
 ## Credits
