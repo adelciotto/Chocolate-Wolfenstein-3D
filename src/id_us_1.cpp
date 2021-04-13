@@ -24,56 +24,43 @@
 
 #pragma hdrstop
 
-#if _MSC_VER == 1200            // Visual C++ 6
-    #define vsnprintf _vsnprintf
+#if _MSC_VER == 1200 // Visual C++ 6
+#define vsnprintf _vsnprintf
 #endif
 
 //  Global variables
-        word        PrintX,PrintY;
-        word        WindowX,WindowY,WindowW,WindowH;
+word PrintX, PrintY;
+word WindowX, WindowY, WindowW, WindowH;
 
 //  Internal variables
-#define ConfigVersion   1
+#define ConfigVersion 1
 
-static  boolean     US_Started;
+static boolean US_Started;
 
-        void        (*USL_MeasureString)(const char *,word *,word *) = VW_MeasurePropString;
-        void        (*USL_DrawString)(const char *) = VWB_DrawPropString;
+void (*USL_MeasureString)(const char *, word *, word *) = VW_MeasurePropString;
+void (*USL_DrawString)(const char *) = VWB_DrawPropString;
 
-        SaveGame    Games[MaxSaveGames];
-        HighScore   Scores[MaxScores] =
-                    {
-                        {"id software-'92",10000,1},
-                        {"Adrian Carmack",10000,1},
-                        {"John Carmack",10000,1},
-                        {"Kevin Cloud",10000,1},
-                        {"Tom Hall",10000,1},
-                        {"John Romero",10000,1},
-                        {"Jay Wilbur",10000,1},
-                    };
+SaveGame Games[MaxSaveGames];
+HighScore Scores[MaxScores] = {
+    {"id software-'92", 10000, 1}, {"Adrian Carmack", 10000, 1}, {"John Carmack", 10000, 1}, {"Kevin Cloud", 10000, 1},
+    {"Tom Hall", 10000, 1},        {"John Romero", 10000, 1},    {"Jay Wilbur", 10000, 1},
+};
 
 int rndindex = 0;
 
 static byte rndtable[] = {
-      0,   8, 109, 220, 222, 241, 149, 107,  75, 248, 254, 140,  16,  66,
-     74,  21, 211,  47,  80, 242, 154,  27, 205, 128, 161,  89,  77,  36,
-     95, 110,  85,  48, 212, 140, 211, 249,  22,  79, 200,  50,  28, 188,
-     52, 140, 202, 120,  68, 145,  62,  70, 184, 190,  91, 197, 152, 224,
-    149, 104,  25, 178, 252, 182, 202, 182, 141, 197,   4,  81, 181, 242,
-    145,  42,  39, 227, 156, 198, 225, 193, 219,  93, 122, 175, 249,   0,
-    175, 143,  70, 239,  46, 246, 163,  53, 163, 109, 168, 135,   2, 235,
-     25,  92,  20, 145, 138,  77,  69, 166,  78, 176, 173, 212, 166, 113,
-     94, 161,  41,  50, 239,  49, 111, 164,  70,  60,   2,  37, 171,  75,
-    136, 156,  11,  56,  42, 146, 138, 229,  73, 146,  77,  61,  98, 196,
-    135, 106,  63, 197, 195,  86,  96, 203, 113, 101, 170, 247, 181, 113,
-     80, 250, 108,   7, 255, 237, 129, 226,  79, 107, 112, 166, 103, 241,
-     24, 223, 239, 120, 198,  58,  60,  82, 128,   3, 184,  66, 143, 224,
-    145, 224,  81, 206, 163,  45,  63,  90, 168, 114,  59,  33, 159,  95,
-     28, 139, 123,  98, 125, 196,  15,  70, 194, 253,  54,  14, 109, 226,
-     71,  17, 161,  93, 186,  87, 244, 138,  20,  52, 123, 251,  26,  36,
-     17,  46,  52, 231, 232,  76,  31, 221,  84,  37, 216, 165, 212, 106,
-    197, 242,  98,  43,  39, 175, 254, 145, 190,  84, 118, 222, 187, 136,
-    120, 163, 236, 249 };
+    0,   8,   109, 220, 222, 241, 149, 107, 75,  248, 254, 140, 16,  66,  74,  21,  211, 47,  80,  242, 154, 27,
+    205, 128, 161, 89,  77,  36,  95,  110, 85,  48,  212, 140, 211, 249, 22,  79,  200, 50,  28,  188, 52,  140,
+    202, 120, 68,  145, 62,  70,  184, 190, 91,  197, 152, 224, 149, 104, 25,  178, 252, 182, 202, 182, 141, 197,
+    4,   81,  181, 242, 145, 42,  39,  227, 156, 198, 225, 193, 219, 93,  122, 175, 249, 0,   175, 143, 70,  239,
+    46,  246, 163, 53,  163, 109, 168, 135, 2,   235, 25,  92,  20,  145, 138, 77,  69,  166, 78,  176, 173, 212,
+    166, 113, 94,  161, 41,  50,  239, 49,  111, 164, 70,  60,  2,   37,  171, 75,  136, 156, 11,  56,  42,  146,
+    138, 229, 73,  146, 77,  61,  98,  196, 135, 106, 63,  197, 195, 86,  96,  203, 113, 101, 170, 247, 181, 113,
+    80,  250, 108, 7,   255, 237, 129, 226, 79,  107, 112, 166, 103, 241, 24,  223, 239, 120, 198, 58,  60,  82,
+    128, 3,   184, 66,  143, 224, 145, 224, 81,  206, 163, 45,  63,  90,  168, 114, 59,  33,  159, 95,  28,  139,
+    123, 98,  125, 196, 15,  70,  194, 253, 54,  14,  109, 226, 71,  17,  161, 93,  186, 87,  244, 138, 20,  52,
+    123, 251, 26,  36,  17,  46,  52,  231, 232, 76,  31,  221, 84,  37,  216, 165, 212, 106, 197, 242, 98,  43,
+    39,  175, 254, 145, 190, 84,  118, 222, 187, 136, 120, 163, 236, 249};
 
 //  Internal routines
 
@@ -89,19 +76,17 @@ void US_Startup()
     if (US_Started)
         return;
 
-    US_InitRndT(true);      // Initialize the random number generator
+    US_InitRndT(true); // Initialize the random number generator
 
     US_Started = true;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
 //  US_Shutdown() - Shuts down the User Mgr
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-US_Shutdown(void)
+void US_Shutdown(void)
 {
     if (!US_Started)
         return;
@@ -118,9 +103,7 @@ US_Shutdown(void)
 //      between masked and non-masked fonts
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-US_SetPrintRoutines(void (*measure)(const char *,word *,word *),
-    void (*print)(const char *))
+void US_SetPrintRoutines(void (*measure)(const char *, word *, word *), void (*print)(const char *))
 {
     USL_MeasureString = measure;
     USL_DrawString = print;
@@ -132,23 +115,22 @@ US_SetPrintRoutines(void (*measure)(const char *,word *,word *),
 //      supported.
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-US_Print(const char *sorg)
+void US_Print(const char *sorg)
 {
     char c;
     char *sstart = strdup(sorg);
     char *s = sstart;
     char *se;
-    word w,h;
+    word w, h;
 
     while (*s)
     {
         se = s;
-        while ((c = *se)!=0 && (c != '\n'))
+        while ((c = *se) != 0 && (c != '\n'))
             se++;
         *se = '\0';
 
-        USL_MeasureString(s,&w,&h);
+        USL_MeasureString(s, &w, &h);
         px = PrintX;
         py = PrintY;
         USL_DrawString(s);
@@ -173,11 +155,10 @@ US_Print(const char *sorg)
 //  US_PrintUnsigned() - Prints an unsigned long
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-US_PrintUnsigned(longword n)
+void US_PrintUnsigned(longword n)
 {
-    char    buffer[32];
-    sprintf(buffer, "%lu", n);
+    char buffer[32];
+    sprintf(buffer, "%u", n);
 
     US_Print(buffer);
 }
@@ -187,12 +168,11 @@ US_PrintUnsigned(longword n)
 //  US_PrintSigned() - Prints a signed long
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-US_PrintSigned(int32_t n)
+void US_PrintSigned(int32_t n)
 {
-    char    buffer[32];
+    char buffer[32];
 
-    US_Print(ltoa(n,buffer,10));
+    US_Print(ltoa(n, buffer, 10));
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -200,13 +180,11 @@ US_PrintSigned(int32_t n)
 //  USL_PrintInCenter() - Prints a string in the center of the given rect
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-USL_PrintInCenter(const char *s,Rect r)
+void USL_PrintInCenter(const char *s, Rect r)
 {
-    word    w,h,
-            rw,rh;
+    word w, h, rw, rh;
 
-    USL_MeasureString(s,&w,&h);
+    USL_MeasureString(s, &w, &h);
     rw = r.lr.x - r.ul.x;
     rh = r.lr.y - r.ul.y;
 
@@ -220,17 +198,16 @@ USL_PrintInCenter(const char *s,Rect r)
 //  US_PrintCentered() - Prints a string centered in the current window.
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-US_PrintCentered(const char *s)
+void US_PrintCentered(const char *s)
 {
-    Rect    r;
+    Rect r;
 
     r.ul.x = WindowX;
     r.ul.y = WindowY;
     r.lr.x = r.ul.x + WindowW;
     r.lr.y = r.ul.y + WindowH;
 
-    USL_PrintInCenter(s,r);
+    USL_PrintInCenter(s, r);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -239,12 +216,11 @@ US_PrintCentered(const char *s)
 //      advances to the next line. Newlines are not supported.
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-US_CPrintLine(const char *s)
+void US_CPrintLine(const char *s)
 {
-    word    w,h;
+    word w, h;
 
-    USL_MeasureString(s,&w,&h);
+    USL_MeasureString(s, &w, &h);
 
     if (w > WindowW)
         Quit("US_CPrintLine() - String exceeds width");
@@ -260,10 +236,9 @@ US_CPrintLine(const char *s)
 //      Newlines are supported.
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-US_CPrint(const char *sorg)
+void US_CPrint(const char *sorg)
 {
-    char    c;
+    char c;
     char *sstart = strdup(sorg);
     char *s = sstart;
     char *se;
@@ -271,7 +246,7 @@ US_CPrint(const char *sorg)
     while (*s)
     {
         se = s;
-        while ((c = *se)!=0 && (c != '\n'))
+        while ((c = *se) != 0 && (c != '\n'))
             se++;
         *se = '\0';
 
@@ -301,7 +276,7 @@ void US_Printf(const char *formatStr, ...)
     va_start(vlist, formatStr);
     int len = vsnprintf(strbuf, sizeof(strbuf), formatStr, vlist);
     va_end(vlist);
-    if(len <= -1 || len >= sizeof(strbuf))
+    if (len <= -1 || len >= sizeof(strbuf))
         strbuf[sizeof(strbuf) - 1] = 0;
     US_Print(strbuf);
 }
@@ -320,7 +295,7 @@ void US_CPrintf(const char *formatStr, ...)
     va_start(vlist, formatStr);
     int len = vsnprintf(strbuf, sizeof(strbuf), formatStr, vlist);
     va_end(vlist);
-    if(len <= -1 || len >= sizeof(strbuf))
+    if (len <= -1 || len >= sizeof(strbuf))
         strbuf[sizeof(strbuf) - 1] = 0;
     US_CPrint(strbuf);
 }
@@ -331,10 +306,9 @@ void US_CPrintf(const char *formatStr, ...)
 //      cursor
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-US_ClearWindow(void)
+void US_ClearWindow(void)
 {
-    VWB_Bar(WindowX,WindowY,WindowW,WindowH,WHITE);
+    VWB_Bar(WindowX, WindowY, WindowW, WindowH, WHITE);
     PrintX = WindowX;
     PrintY = WindowY;
 }
@@ -344,12 +318,10 @@ US_ClearWindow(void)
 //  US_DrawWindow() - Draws a frame and sets the current window parms
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-US_DrawWindow(word x,word y,word w,word h)
+void US_DrawWindow(word x, word y, word w, word h)
 {
-   
-    word    i,
-            sx,sy,sw,sh;
+
+    word i, sx, sy, sw, sh;
 
     WindowX = x * 8;
     WindowY = y * 8;
@@ -366,13 +338,13 @@ US_DrawWindow(word x,word y,word w,word h)
 
     US_ClearWindow();
 
-    VWB_DrawTile8(sx,sy,0),VWB_DrawTile8(sx,sy + sh,5);
-    for (i = sx + 8;i <= sx + sw - 8;i += 8)
-        VWB_DrawTile8(i,sy,1),VWB_DrawTile8(i,sy + sh,6);
-    VWB_DrawTile8(i,sy,2),VWB_DrawTile8(i,sy + sh,7);
+    VWB_DrawTile8(sx, sy, 0), VWB_DrawTile8(sx, sy + sh, 5);
+    for (i = sx + 8; i <= sx + sw - 8; i += 8)
+        VWB_DrawTile8(i, sy, 1), VWB_DrawTile8(i, sy + sh, 6);
+    VWB_DrawTile8(i, sy, 2), VWB_DrawTile8(i, sy + sh, 7);
 
-    for (i = sy + 8;i <= sy + sh - 8;i += 8)
-        VWB_DrawTile8(sx,i,3),VWB_DrawTile8(sx + sw,i,4);
+    for (i = sy + 8; i <= sy + sh - 8; i += 8)
+        VWB_DrawTile8(sx, i, 3), VWB_DrawTile8(sx + sw, i, 4);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -381,8 +353,7 @@ US_DrawWindow(word x,word y,word w,word h)
 //      later restoration
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-US_SaveWindow(WindowRec *win)
+void US_SaveWindow(WindowRec *win)
 {
     win->x = WindowX;
     win->y = WindowY;
@@ -399,8 +370,7 @@ US_SaveWindow(WindowRec *win)
 //      record
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-US_RestoreWindow(WindowRec *win)
+void US_RestoreWindow(WindowRec *win)
 {
     WindowX = win->x;
     WindowY = win->y;
@@ -418,21 +388,20 @@ US_RestoreWindow(WindowRec *win)
 //  USL_XORICursor() - XORs the I-bar text cursor. Used by US_LineInput()
 //
 ///////////////////////////////////////////////////////////////////////////
-static void
-USL_XORICursor(int x,int y,const char *s,word cursor)
+static void USL_XORICursor(int x, int y, const char *s, word cursor)
 {
-    static  boolean status;     // VGA doesn't XOR...
-    char    buf[MaxString];
-    int     temp;
-    word    w,h;
+    static boolean status; // VGA doesn't XOR...
+    char buf[MaxString];
+    int temp;
+    word w, h;
 
-    strcpy(buf,s);
+    strcpy(buf, s);
     buf[cursor] = '\0';
-    USL_MeasureString(buf,&w,&h);
+    USL_MeasureString(buf, &w, &h);
 
     px = x + w - 1;
     py = y;
-    if (status^=1)
+    if (status ^= 1)
         USL_DrawString("\x80");
     else
     {
@@ -448,16 +417,20 @@ char USL_RotateChar(char ch, int dir)
     static const char charSet[] = " ABCDEFGHIJKLMNOPQRSTUVWXYZ.,-!?0123456789";
     const int numChars = sizeof(charSet) / sizeof(char) - 1;
     int i;
-    for(i = 0; i < numChars; i++)
+    for (i = 0; i < numChars; i++)
     {
-        if(ch == charSet[i]) break;
+        if (ch == charSet[i])
+            break;
     }
 
-    if(i == numChars) i = 0;
+    if (i == numChars)
+        i = 0;
 
     i += dir;
-    if(i < 0) i = numChars - 1;
-    else if(i >= numChars) i = 0;
+    if (i < 0)
+        i = numChars - 1;
+    else if (i >= numChars)
+        i = 0;
     return charSet[i];
 }
 
@@ -471,35 +444,29 @@ char USL_RotateChar(char ch, int dir)
 //      returned
 //
 ///////////////////////////////////////////////////////////////////////////
-boolean
-US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
-                int maxchars,int maxwidth)
+boolean US_LineInput(int x, int y, char *buf, const char *def, boolean escok, int maxchars, int maxwidth)
 {
-    boolean     redraw,
-                cursorvis,cursormoved,
-                done,result, checkkey;
-    ScanCode    sc;
-    char        c;
-    char        s[MaxString],olds[MaxString];
-    int         cursor,len;
-    word        i,
-                w,h,
-                temp;
-    longword    curtime, lasttime, lastdirtime, lastbuttontime, lastdirmovetime;
+    boolean redraw, cursorvis, cursormoved, done, result, checkkey;
+    ScanCode sc;
+    char c;
+    char s[MaxString], olds[MaxString];
+    int cursor, len;
+    word i, w, h, temp;
+    longword curtime, lasttime, lastdirtime, lastbuttontime, lastdirmovetime;
     ControlInfo ci;
-    Direction   lastdir = dir_None;
+    Direction lastdir = dir_None;
 
     if (def)
-        strcpy(s,def);
+        strcpy(s, def);
     else
         *s = '\0';
     *olds = '\0';
-    cursor = (int) strlen(s);
+    cursor = (int)strlen(s);
     cursormoved = redraw = true;
 
     cursorvis = done = false;
     lasttime = lastdirtime = lastdirmovetime = GetTimeCount();
-    lastbuttontime = lasttime + TickBase / 4;   // 250 ms => first button press accepted after 500 ms
+    lastbuttontime = lasttime + TickBase / 4; // 250 ms => first button press accepted after 500 ms
     LastASCII = key_None;
     LastScan = sc_None;
 
@@ -508,7 +475,7 @@ US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
         ReadAnyControl(&ci);
 
         if (cursorvis)
-            USL_XORICursor(x,y,s,cursor);
+            USL_XORICursor(x, y, s, cursor);
 
         sc = LastScan;
         LastScan = sc_None;
@@ -518,92 +485,97 @@ US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
         checkkey = true;
         curtime = GetTimeCount();
 
-        // After each direction change accept the next change after 250 ms and then everz 125 ms
-        if(ci.dir != lastdir || curtime - lastdirtime > TickBase / 4 && curtime - lastdirmovetime > TickBase / 8)
+        // After each direction change accept the next change after 250 ms and
+        // then everz 125 ms
+        if (ci.dir != lastdir || curtime - lastdirtime > TickBase / 4 && curtime - lastdirmovetime > TickBase / 8)
         {
-            if(ci.dir != lastdir)
+            if (ci.dir != lastdir)
             {
                 lastdir = ci.dir;
                 lastdirtime = curtime;
             }
             lastdirmovetime = curtime;
 
-            switch(ci.dir)
+            switch (ci.dir)
             {
-                case dir_West:
-                    if(cursor)
-                    {
-                        // Remove trailing whitespace if cursor is at end of string
-                        if(s[cursor] == ' ' && s[cursor + 1] == 0)
-                            s[cursor] = 0;
-                        cursor--;
-                    }
-                    cursormoved = true;
-                    checkkey = false;
-                    break;
-                case dir_East:
-                    if(cursor >= MaxString - 1) break;
-
-                    if(!s[cursor])
-                    {
-                        USL_MeasureString(s,&w,&h);
-                        if(len >= maxchars || maxwidth && w >= maxwidth) break;
-
-                        s[cursor] = ' ';
-                        s[cursor + 1] = 0;
-                    }
-                    cursor++;
-                    cursormoved = true;
-                    checkkey = false;
+            case dir_West:
+                if (cursor)
+                {
+                    // Remove trailing whitespace if cursor is at end of string
+                    if (s[cursor] == ' ' && s[cursor + 1] == 0)
+                        s[cursor] = 0;
+                    cursor--;
+                }
+                cursormoved = true;
+                checkkey = false;
+                break;
+            case dir_East:
+                if (cursor >= MaxString - 1)
                     break;
 
-                case dir_North:
-                    if(!s[cursor])
-                    {
-                        USL_MeasureString(s,&w,&h);
-                        if(len >= maxchars || maxwidth && w >= maxwidth) break;
-                        s[cursor + 1] = 0;
-                    }
-                    s[cursor] = USL_RotateChar(s[cursor], 1);
-                    redraw = true;
-                    checkkey = false;
-                    break;
+                if (!s[cursor])
+                {
+                    USL_MeasureString(s, &w, &h);
+                    if (len >= maxchars || maxwidth && w >= maxwidth)
+                        break;
 
-                case dir_South:
-                    if(!s[cursor])
-                    {
-                        USL_MeasureString(s,&w,&h);
-                        if(len >= maxchars || maxwidth && w >= maxwidth) break;
-                        s[cursor + 1] = 0;
-                    }
-                    s[cursor] = USL_RotateChar(s[cursor], -1);
-                    redraw = true;
-                    checkkey = false;
-                    break;
+                    s[cursor] = ' ';
+                    s[cursor + 1] = 0;
+                }
+                cursor++;
+                cursormoved = true;
+                checkkey = false;
+                break;
+
+            case dir_North:
+                if (!s[cursor])
+                {
+                    USL_MeasureString(s, &w, &h);
+                    if (len >= maxchars || maxwidth && w >= maxwidth)
+                        break;
+                    s[cursor + 1] = 0;
+                }
+                s[cursor] = USL_RotateChar(s[cursor], 1);
+                redraw = true;
+                checkkey = false;
+                break;
+
+            case dir_South:
+                if (!s[cursor])
+                {
+                    USL_MeasureString(s, &w, &h);
+                    if (len >= maxchars || maxwidth && w >= maxwidth)
+                        break;
+                    s[cursor + 1] = 0;
+                }
+                s[cursor] = USL_RotateChar(s[cursor], -1);
+                redraw = true;
+                checkkey = false;
+                break;
             }
         }
 
-        if((int)(curtime - lastbuttontime) > TickBase / 4)   // 250 ms
+        if ((int)(curtime - lastbuttontime) > TickBase / 4) // 250 ms
         {
-            if(ci.button0)             // acts as return
+            if (ci.button0) // acts as return
             {
-                strcpy(buf,s);
+                strcpy(buf, s);
                 done = true;
                 result = true;
                 checkkey = false;
             }
-            if(ci.button1 && escok)    // acts as escape
+            if (ci.button1 && escok) // acts as escape
             {
                 done = true;
                 result = false;
                 checkkey = false;
             }
-            if(ci.button2)             // acts as backspace
+            if (ci.button2) // acts as backspace
             {
                 lastbuttontime = curtime;
-                if(cursor)
+                if (cursor)
                 {
-                    strcpy(s + cursor - 1,s + cursor);
+                    strcpy(s + cursor - 1, s + cursor);
                     cursor--;
                     redraw = true;
                 }
@@ -612,87 +584,87 @@ US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
             }
         }
 
-        if(checkkey)
+        if (checkkey)
         {
             switch (sc)
             {
-                case sc_LeftArrow:
-                    if (cursor)
-                        cursor--;
-                    c = key_None;
-                    cursormoved = true;
-                    break;
-                case sc_RightArrow:
-                    if (s[cursor])
-                        cursor++;
-                    c = key_None;
-                    cursormoved = true;
-                    break;
-                case sc_Home:
-                    cursor = 0;
-                    c = key_None;
-                    cursormoved = true;
-                    break;
-                case sc_End:
-                    cursor = (int) strlen(s);
-                    c = key_None;
-                    cursormoved = true;
-                    break;
+            case sc_LeftArrow:
+                if (cursor)
+                    cursor--;
+                c = key_None;
+                cursormoved = true;
+                break;
+            case sc_RightArrow:
+                if (s[cursor])
+                    cursor++;
+                c = key_None;
+                cursormoved = true;
+                break;
+            case sc_Home:
+                cursor = 0;
+                c = key_None;
+                cursormoved = true;
+                break;
+            case sc_End:
+                cursor = (int)strlen(s);
+                c = key_None;
+                cursormoved = true;
+                break;
 
-                case sc_Return:
-                    strcpy(buf,s);
+            case sc_Return:
+                strcpy(buf, s);
+                done = true;
+                result = true;
+                c = key_None;
+                break;
+            case sc_Escape:
+                if (escok)
+                {
                     done = true;
-                    result = true;
-                    c = key_None;
-                    break;
-                case sc_Escape:
-                    if (escok)
-                    {
-                        done = true;
-                        result = false;
-                    }
-                    c = key_None;
-                    break;
+                    result = false;
+                }
+                c = key_None;
+                break;
 
-                case sc_BackSpace:
-                    if (cursor)
-                    {
-                        strcpy(s + cursor - 1,s + cursor);
-                        cursor--;
-                        redraw = true;
-                    }
-                    c = key_None;
-                    cursormoved = true;
-                    break;
-                case sc_Delete:
-                    if (s[cursor])
-                    {
-                        strcpy(s + cursor,s + cursor + 1);
-                        redraw = true;
-                    }
-                    c = key_None;
-                    cursormoved = true;
-                    break;
+            case sc_BackSpace:
+                if (cursor)
+                {
+                    strcpy(s + cursor - 1, s + cursor);
+                    cursor--;
+                    redraw = true;
+                }
+                c = key_None;
+                cursormoved = true;
+                break;
+            case sc_Delete:
+                if (s[cursor])
+                {
+                    strcpy(s + cursor, s + cursor + 1);
+                    redraw = true;
+                }
+                c = key_None;
+                cursormoved = true;
+                break;
 
-                case SDL_SCANCODE_KP_5: //0x4c:  // Keypad 5 // TODO: hmmm...
-                case sc_UpArrow:
-                case sc_DownArrow:
-                case sc_PgUp:
-                case sc_PgDn:
-                case sc_Insert:
-                    c = key_None;
-                    break;
+            case SDL_SCANCODE_KP_5: // 0x4c:  // Keypad 5 // TODO: hmmm...
+            case sc_UpArrow:
+            case sc_DownArrow:
+            case sc_PgUp:
+            case sc_PgDn:
+            case sc_Insert:
+                c = key_None;
+                break;
             }
 
             if (c)
             {
-                len = (int) strlen(s);
-                USL_MeasureString(s,&w,&h);
+                len = (int)strlen(s);
+                USL_MeasureString(s, &w, &h);
 
-                if(isprint(c) && (len < MaxString - 1) && ((!maxchars) || (len < maxchars))
-                    && ((!maxwidth) || (w < maxwidth)))
+                if (isprint(c) && (len < MaxString - 1) && ((!maxchars) || (len < maxchars)) &&
+                    ((!maxwidth) || (w < maxwidth)))
                 {
-                    for (i = len + 1;i > cursor;i--)
+                    for (i = len + 1; i > cursor; i--)
                         s[i] = s[i - 1];
                     s[cursor++] = c;
                     redraw = true;
@@ -707,8 +679,8 @@ US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
             temp = fontcolor;
             fontcolor = backcolor;
             USL_DrawString(olds);
-            fontcolor = (byte) temp;
-            strcpy(olds,s);
+            fontcolor = (byte)temp;
+            strcpy(olds, s);
 
             px = x;
             py = y;
@@ -724,21 +696,22 @@ US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
 
             cursormoved = false;
         }
-        if (curtime - lasttime > TickBase / 2)    // 500 ms
+        if (curtime - lasttime > TickBase / 2) // 500 ms
         {
             lasttime = curtime;
 
             cursorvis ^= true;
         }
-        else SDL_Delay(5);
+        else
+            SDL_Delay(5);
         if (cursorvis)
-            USL_XORICursor(x,y,s,cursor);
+            USL_XORICursor(x, y, s, cursor);
 
         VW_UpdateScreen();
     }
 
     if (cursorvis)
-        USL_XORICursor(x,y,s,cursor);
+        USL_XORICursor(x, y, s, cursor);
     if (!result)
     {
         px = x;
@@ -748,7 +721,7 @@ US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
     VW_UpdateScreen();
 
     IN_ClearKeysDown();
-    return(result);
+    return (result);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -760,7 +733,7 @@ US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
 ///////////////////////////////////////////////////////////////////////////
 void US_InitRndT(int randomize)
 {
-    if(randomize)
+    if (randomize)
         rndindex = (SDL_GetTicks() >> 4) & 0xff;
     else
         rndindex = 0;
@@ -773,6 +746,6 @@ void US_InitRndT(int randomize)
 ///////////////////////////////////////////////////////////////////////////
 int US_RndT()
 {
-    rndindex = (rndindex+1)&0xff;
+    rndindex = (rndindex + 1) & 0xff;
     return rndtable[rndindex];
 }

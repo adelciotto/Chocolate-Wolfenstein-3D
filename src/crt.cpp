@@ -16,8 +16,8 @@ static void CRT_Screenshot();
 
 void CRT_Init(int _width)
 {
-    width  = _width;
-    height = _width * 3.0/4.0;
+    width = _width;
+    height = _width * 3.0 / 4.0;
 }
 
 void CRT_DAC(void)
@@ -31,7 +31,7 @@ void CRT_DAC(void)
 
     const uint8_t *keyState = SDL_GetKeyboardState(NULL);
     static int wasPressed = 0;
-    if (keyState[SDL_SCANCODE_I])
+    if (keyState[SDL_SCANCODE_PRINTSCREEN])
     {
         if (!wasPressed)
         {
@@ -47,30 +47,30 @@ void CRT_DAC(void)
 
 void CRT_Screenshot()
 {
-    const char* filename = "screenshot.tga";
+    const char *filename = "screenshot.tga";
 
-    int pitch = width*4;
-    size_t size = pitch*height;
-    uint8_t *pixels = (uint8_t*) malloc(size);
+    int pitch = width * 4;
+    size_t size = pitch * height;
+    uint8_t *pixels = (uint8_t *)malloc(size);
     if (!pixels)
         return;
 
     SDL_RenderReadPixels(sdlRenderer, NULL, SDL_PIXELFORMAT_ARGB8888, pixels, pitch);
 
-    //Now the file creation
+    // Now the file creation
     FILE *filePtr = fopen(filename, "wb");
     if (!filePtr)
         return;
 
-    uint8_t TGAheader[12]={0,0,2,0,0,0,0,0,0,0,0,0};
-    uint8_t header[6] = {width%256, width/256, height%256, height/256, 32, 0 | 1 << 5};
+    uint8_t TGAheader[12] = {0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    uint8_t header[6] = {width % 256, width / 256, height % 256, height / 256, 32, 0 | 1 << 5};
 
     // We write the headers
-    fwrite(TGAheader, sizeof(uint8_t),12, filePtr);
-    fwrite(header,	sizeof(uint8_t),6, filePtr);
+    fwrite(TGAheader, sizeof(uint8_t), 12, filePtr);
+    fwrite(header, sizeof(uint8_t), 6, filePtr);
     // And finally our image data
-    fwrite(pixels,	sizeof(uint8_t), pitch*height, filePtr);
+    fwrite(pixels, sizeof(uint8_t), pitch * height, filePtr);
     fclose(filePtr);
 
-    printf("Screenshot taken to screenshot.tga");
+    printf("Screenshot taken to screenshot.tga\n");
 }
