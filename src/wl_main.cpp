@@ -1572,40 +1572,9 @@ void CheckParameters(int argc, char *argv[])
             fullscreen = false;
             forcegrabmouse = true;
         }
-        else IFARG("--res")
+        else IFARG("--scale2x")
         {
-            if (i + 2 >= argc)
-            {
-                printf("The res option needs the width and/or the height "
-                       "argument!\n");
-                hasError = true;
-            }
-            else
-            {
-                screenWidth = atoi(argv[++i]);
-                screenHeight = atoi(argv[++i]);
-                unsigned factor = screenWidth / 320;
-                if (screenWidth % 320 || screenHeight != 200 * factor && screenHeight != 240 * factor)
-                    printf("Screen size must be a multiple of 320x200 or 320x240!\n"), hasError = true;
-            }
-        }
-        else IFARG("--resf")
-        {
-            if (i + 2 >= argc)
-            {
-                printf("The resf option needs the width and/or the height "
-                       "argument!\n");
-                hasError = true;
-            }
-            else
-            {
-                screenWidth = atoi(argv[++i]);
-                screenHeight = atoi(argv[++i]);
-                if (screenWidth < 320)
-                    printf("Screen width must be at least 320!\n"), hasError = true;
-                if (screenHeight < 200)
-                    printf("Screen height must be at least 200!\n"), hasError = true;
-            }
+            screenScale2x = true;
         }
         else IFARG("--bits")
         {
@@ -1758,10 +1727,7 @@ void CheckParameters(int argc, char *argv[])
                " --nowait               Skips intro screens\n"
                " --windowed[-mouse]     Starts the game in a window [and grabs "
                "mouse]\n"
-               " --res <width> <height> Sets the screen resolution\n"
-               "                        (must be multiple of 320x200 or 320x240)\n"
-               " --resf <w> <h>         Sets any screen resolution >= 320x200\n"
-               "                        (which may result in graphic errors)\n"
+               " --scale2x              Scale the game resolution by 2\n"
                " --bits <b>             Sets the screen color depth\n"
                "                        (use this when you have palette/fading "
                "problems\n"

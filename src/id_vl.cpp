@@ -24,9 +24,12 @@
 boolean fullscreen = true;
 
 boolean usedoublebuffering = true;
-unsigned screenWidth = 640;
-unsigned screenHeight = 480;
+boolean screenScale2x = false;
+unsigned screenWidth = 320;
+unsigned screenHeight = 200;
 unsigned screenBits = 32;
+static unsigned scaledScreenWidth = 640;
+static unsigned scaledScreenHeight = 480;
 
 SDL_Surface *screen = NULL;
 unsigned screenPitch;
@@ -39,7 +42,8 @@ unsigned curPitch;
 
 SDL_Window *sdlWindow = NULL;
 SDL_Renderer *sdlRenderer = NULL;
-SDL_Texture *sdlTexture = NULL;
+SDL_Texture *screenTexture = NULL;
+SDL_Texture *upscaledTexture = NULL;
 SDL_Palette *sdlPalette = NULL;
 
 unsigned scaleFactor;
@@ -98,15 +102,19 @@ void VL_SetVGAPlaneMode(void)
     title = "Wolfenstein 3D";
 #endif
 
-    // Fab's CRT Hack
-    // Adjust height so the screen is 4:3 aspect ratio
-    screenHeight = screenWidth * 3.0 / 4.0;
+    if (screenScale2x)
+    {
+        screenWidth *= 2;
+        screenHeight *= 2;
+        scaledScreenWidth *= 2;
+        scaledScreenHeight *= 2;
+    }
 
-    sdlWindow = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight,
-                                 SDL_WINDOW_SHOWN);
+    sdlWindow = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                                 scaledScreenWidth, scaledScreenHeight, SDL_WINDOW_SHOWN);
     if (!sdlWindow)
     {
-        printf("Unable to create SDL_Window %ix%i: %s\n", screenWidth, screenHeight, SDL_GetError());
+        printf("Unable to create SDL_Window %ix%i: %s\n", scaledScreenWidth, scaledScreenHeight, SDL_GetError());
         exit(1);
     }
 
@@ -122,7 +130,7 @@ void VL_SetVGAPlaneMode(void)
         exit(1);
     }
 
-    SDL_RenderSetLogicalSize(sdlRenderer, screenWidth, screenHeight);
+    SDL_RenderSetLogicalSize(sdlRenderer, scaledScreenWidth, scaledScreenHeight);
     SDL_ShowCursor(SDL_DISABLE);
 
     sdlPalette = SDL_AllocPalette(256);
@@ -131,16 +139,11 @@ void VL_SetVGAPlaneMode(void)
         printf("Unable to allocate SDL_Pallete: %s\n", SDL_GetError());
         exit(1);
     }
-
     SDL_SetPaletteColors(sdlPalette, gamepal, 0, 256);
     memcpy(curpal, gamepal, sizeof(SDL_Color) * 256);
 
     // Fab's CRT Hack
-    CRT_Init(screenWidth);
-
-    // Fab's CRT Hack
-    screenWidth = 320;
-    screenHeight = 200;
+    CRT_Init(scaledScreenWidth);
 
     screenBuffer = SDL_CreateRGBSurface(0, screenWidth, screenHeight, 8, 0, 0, 0, 0);
     if (!screenBuffer)
@@ -150,14 +153,34 @@ void VL_SetVGAPlaneMode(void)
     }
     SDL_SetSurfacePalette(screenBuffer, sdlPalette);
 
-    screen = SDL_CreateRGBSurface(0, screenWidth, screenHeight, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+    screen = SDL_CreateRGBSurface(0, screenWidth, screenHeight, 32, 0x00FF0000,
+                                  0x0000FF00, 0x000000FF, 0xFF000000);
     if (!screen)
     {
         printf("Unable to create screen surface: %s\n", SDL_GetError());
         exit(1);
     }
-    sdlTexture = SDL_CreateTexture(sdlRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, screenWidth,
-                                   screenHeight);
+
+    // Create the intermediate texture that we render the screen surface into.
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+    screenTexture = SDL_CreateTexture(sdlRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING,
+                                      screenWidth, screenHeight);
+    if (!screenTexture)
+    {
+        printf("Unable to create screen texture: %s\n", SDL_GetError());
+        exit(1);
+    }
+
+    // Create the up-scaled texture that we render to the window. We use 'linear' scaling here because depending on the
+    // window size, the texture may need to be scaled by a non-integer factor.
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+    upscaledTexture = SDL_CreateTexture(sdlRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET,
+                                        scaledScreenWidth, scaledScreenHeight);
+    if (!upscaledTexture)
+    {
+        printf("Unable to create up-scaled texture: %s\n", SDL_GetError());
+        exit(1);
+    }
 
     screenPitch = screen->pitch;
     bufferPitch = screenBuffer->pitch;

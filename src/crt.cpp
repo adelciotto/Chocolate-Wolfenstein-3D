@@ -22,11 +22,17 @@ void CRT_Init(int _width)
 
 void CRT_DAC(void)
 {
-    SDL_UpdateTexture(sdlTexture, NULL, screen->pixels, screen->pitch);
-
-    SDL_Rect dest = {.x = 0, .y = 0, .w = width, .h = height};
+    SDL_UpdateTexture(screenTexture, NULL, screen->pixels, screen->pitch);
     SDL_RenderClear(sdlRenderer);
-    SDL_RenderCopy(sdlRenderer, sdlTexture, NULL, &dest);
+
+    // Render the intermediate texture into the up-scaled texture using 'nearest' integer scaling.
+    SDL_SetRenderTarget(sdlRenderer, upscaledTexture);
+    SDL_RenderCopy(sdlRenderer, screenTexture, NULL, NULL);
+
+    // Finally render this up-scaled texture to the window using linear scaling.
+    SDL_SetRenderTarget(sdlRenderer, NULL);
+    SDL_RenderCopy(sdlRenderer, upscaledTexture, NULL, NULL);
+
     SDL_RenderPresent(sdlRenderer);
 
     const uint8_t *keyState = SDL_GetKeyboardState(NULL);
