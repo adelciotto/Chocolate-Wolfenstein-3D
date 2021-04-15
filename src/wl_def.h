@@ -80,6 +80,9 @@ void Quit(const char *errorStr, ...);
 #include "id_vh.h"
 #include "id_vl.h"
 
+// SDL abstraction layer.
+#include "sdl_vl.h"
+
 #include "wl_menu.h"
 
 #define MAPSPOT(x, y, plane) (mapsegs[plane][((y) << mapshift) + (x)])
@@ -1750,11 +1753,5 @@ static inline longword READLONGWORD(byte *&ptr)
     ptr += 4;
     return val;
 }
-
-// By Fabien: This prevents SDL from drawing the surface, openGL does it
-// instead.
-#include "crt.h"
-// Fab's CRT Hack
-#define SDL_Flip(x) CRT_DAC()
 
 #endif

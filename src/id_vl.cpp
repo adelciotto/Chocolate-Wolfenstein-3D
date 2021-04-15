@@ -1,6 +1,5 @@
 // ID_VL.C
 
-#include "crt.h"
 #include "wl_def.h"
 #include <string.h>
 #pragma hdrstop
@@ -31,20 +30,11 @@ unsigned screenBits = 32;
 static unsigned scaledScreenWidth = 640;
 static unsigned scaledScreenHeight = 480;
 
-SDL_Surface *screen = NULL;
 unsigned screenPitch;
-
-SDL_Surface *screenBuffer = NULL;
 unsigned bufferPitch;
 
 SDL_Surface *curSurface = NULL;
 unsigned curPitch;
-
-SDL_Window *sdlWindow = NULL;
-SDL_Renderer *sdlRenderer = NULL;
-SDL_Texture *screenTexture = NULL;
-SDL_Texture *upscaledTexture = NULL;
-SDL_Palette *sdlPalette = NULL;
 
 unsigned scaleFactor;
 
@@ -83,6 +73,7 @@ CASSERT(lengthof(gamepal) == 256)
 void VL_Shutdown(void)
 {
     // VL_SetTextMode ();
+    SDL_VL_Destroy();
 }
 
 /*
@@ -110,82 +101,15 @@ void VL_SetVGAPlaneMode(void)
         scaledScreenHeight *= 2;
     }
 
-    sdlWindow = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                 scaledScreenWidth, scaledScreenHeight, SDL_WINDOW_SHOWN);
-    if (!sdlWindow)
-    {
-        printf("Unable to create SDL_Window %ix%i: %s\n", scaledScreenWidth, scaledScreenHeight, SDL_GetError());
-        exit(1);
-    }
+    SDL_VL_Init(title, screenWidth, screenHeight, scaledScreenWidth, scaledScreenHeight, screenBits, fullscreen);
 
-    if (fullscreen)
-    {
-        SDL_SetWindowFullscreen(sdlWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
-    }
-
-    sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    if (!sdlRenderer)
-    {
-        printf("Unable to create SDL_Renderer: %s\n", SDL_GetError());
-        exit(1);
-    }
-
-    SDL_RenderSetLogicalSize(sdlRenderer, scaledScreenWidth, scaledScreenHeight);
-    SDL_ShowCursor(SDL_DISABLE);
-
-    sdlPalette = SDL_AllocPalette(256);
-    if (!sdlPalette)
-    {
-        printf("Unable to allocate SDL_Pallete: %s\n", SDL_GetError());
-        exit(1);
-    }
-    SDL_SetPaletteColors(sdlPalette, gamepal, 0, 256);
+    SDL_VL_SetPaletteColors(gamepal);
     memcpy(curpal, gamepal, sizeof(SDL_Color) * 256);
 
-    // Fab's CRT Hack
-    CRT_Init(scaledScreenWidth);
-
-    screenBuffer = SDL_CreateRGBSurface(0, screenWidth, screenHeight, 8, 0, 0, 0, 0);
-    if (!screenBuffer)
-    {
-        printf("Unable to create screen buffer surface: %s\n", SDL_GetError());
-        exit(1);
-    }
-    SDL_SetSurfacePalette(screenBuffer, sdlPalette);
-
-    screen = SDL_CreateRGBSurface(0, screenWidth, screenHeight, 32, 0x00FF0000,
-                                  0x0000FF00, 0x000000FF, 0xFF000000);
-    if (!screen)
-    {
-        printf("Unable to create screen surface: %s\n", SDL_GetError());
-        exit(1);
-    }
-
-    // Create the intermediate texture that we render the screen surface into.
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
-    screenTexture = SDL_CreateTexture(sdlRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING,
-                                      screenWidth, screenHeight);
-    if (!screenTexture)
-    {
-        printf("Unable to create screen texture: %s\n", SDL_GetError());
-        exit(1);
-    }
-
-    // Create the up-scaled texture that we render to the window. We use 'linear' scaling here because depending on the
-    // window size, the texture may need to be scaled by a non-integer factor.
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-    upscaledTexture = SDL_CreateTexture(sdlRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET,
-                                        scaledScreenWidth, scaledScreenHeight);
-    if (!upscaledTexture)
-    {
-        printf("Unable to create up-scaled texture: %s\n", SDL_GetError());
-        exit(1);
-    }
-
     screenPitch = screen->pitch;
-    bufferPitch = screenBuffer->pitch;
+    bufferPitch = indexedScreen->pitch;
 
-    curSurface = screenBuffer;
+    curSurface = indexedScreen;
     curPitch = bufferPitch;
 
     scaleFactor = screenWidth / 320;
@@ -259,6 +183,8 @@ void VL_FillPalette(int red, int green, int blue)
 =================
 */
 
+// Unused function
+#if 0
 void VL_SetColor(int color, int red, int green, int blue)
 {
     SDL_Color col = {red, green, blue};
@@ -273,6 +199,7 @@ void VL_SetColor(int color, int red, int green, int blue)
         SDL_Flip(screen);
     }
 }
+#endif
 
 //===========================================================================
 
@@ -305,18 +232,14 @@ void VL_GetColor(int color, int *red, int *green, int *blue)
 void VL_SetPalette(SDL_Color *palette, bool forceupdate)
 {
     memcpy(curpal, palette, sizeof(SDL_Color) * 256);
-    SDL_SetPaletteColors(sdlPalette, palette, 0, 256);
 
-    if (screenBits == 8)
-        SDL_SetSurfacePalette(screenBuffer, sdlPalette);
-    else
+    SDL_VL_SetPaletteColors(palette);
+    SDL_VL_SetSurfacePalette(indexedScreen);
+
+    if (forceupdate)
     {
-        SDL_SetSurfacePalette(screenBuffer, sdlPalette);
-        if (forceupdate)
-        {
-            SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
-            SDL_Flip(screen);
-        }
+        SDL_VL_BlitIndexedSurfaceToScreen();
+        SDL_VL_Present();
     }
 }
 

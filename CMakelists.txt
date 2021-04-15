@@ -38,7 +38,7 @@ set(SOURCE_FILES src/fmopl.cpp
                  src/wl_play.cpp
                  src/wl_state.cpp
                  src/wl_text.cpp
-                 src/crt.cpp)
+        src/sdl_vl.h src/sdl_vl.cpp)
 
 add_executable(Chocolate-Wolfenstein-3D ${SOURCE_FILES})
 target_link_libraries(Chocolate-Wolfenstein-3D PRIVATE SDL2::SDL2 ${SDL2_MIXER_LIBRARIES})

@@ -114,8 +114,8 @@ void VW_MeasurePropString(const char *string, word *width, word *height)
 
 void VH_UpdateScreen()
 {
-    SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
-    SDL_Flip(screen);
+    SDL_VL_BlitIndexedSurfaceToScreen();
+    SDL_VL_Present();
 }
 
 void VWB_DrawTile8(int x, int y, int tile)
@@ -232,7 +232,7 @@ void LoadLatchMem(void)
     {
         Quit("Unable to create surface for tiles!");
     }
-    SDL_SetSurfacePalette(surf, sdlPalette);
+    SDL_VL_SetSurfacePalette(surf);
 
     latchpics[0] = surf;
     CA_CacheGrChunk(STARTTILE8);
@@ -260,7 +260,7 @@ void LoadLatchMem(void)
         {
             Quit("Unable to create surface for picture!");
         }
-        SDL_SetSurfacePalette(surf, sdlPalette);
+        SDL_VL_SetSurfacePalette(surf);
 
         latchpics[2 + i - start] = surf;
         CA_CacheGrChunk(i);
@@ -353,8 +353,8 @@ boolean FizzleFade(SDL_Surface *source, int x1, int y1, unsigned width, unsigned
         if (abortable && IN_CheckAck())
         {
             VL_UnlockSurface(source);
-            SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
-            SDL_Flip(screen);
+            SDL_VL_BlitIndexedSurfaceToScreen();
+            SDL_VL_Present();
             return true;
         }
 
@@ -419,7 +419,7 @@ boolean FizzleFade(SDL_Surface *source, int x1, int y1, unsigned width, unsigned
             first = 0;
 
         VL_UnlockSurface(screen);
-        SDL_Flip(screen);
+        SDL_VL_Present();
 
         frame++;
         Delay(frame - GetTimeCount()); // don't go too fast
@@ -428,7 +428,7 @@ boolean FizzleFade(SDL_Surface *source, int x1, int y1, unsigned width, unsigned
 finished:
     VL_UnlockSurface(source);
     VL_UnlockSurface(screen);
-    SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
-    SDL_Flip(screen);
+    SDL_VL_BlitIndexedSurfaceToScreen();
+    SDL_VL_Present();
     return false;
 }
