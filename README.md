@@ -13,7 +13,22 @@ other small changes.
 
 This is still a WIP. Things I'm planning to do:
 - [ ] Detailed instructions for how to build for each platform (via command line, and CLion IDE).
-- [ ] Ports to game consoles (PSP, PS Vita, etc).
+- [ ] Ports to other platforms/game consoles (PSP, PS Vita, etc).
+
+## Modern game controller (Xbox, PS3/PS4, etc) mapping
+
+**Action**|**Button**
+:-----:|:-----:
+Move Forward/Backward|Left-Stick Up/Down
+Strafe Left/Right|Left-Stick Left/Right
+Look Left/Right|Right-Stick Left/Right
+Use|A
+Shoot|Right-Trigger or Right-Shoulder
+Sprint|Left-Trigger or Left-Shoulder
+Cycle Previous Weapon|Y
+Cycle Next Weapon|B
+Pause|Pause
+Escape|Back
 
 ## Credits
 

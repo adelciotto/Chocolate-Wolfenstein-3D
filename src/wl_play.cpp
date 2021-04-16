@@ -50,7 +50,7 @@ unsigned tics;
 boolean mouseenabled, joystickenabled;
 int dirscan[4] = {sc_UpArrow, sc_RightArrow, sc_DownArrow, sc_LeftArrow};
 int buttonscan[NUMBUTTONS] = {sc_Control, sc_Alt, sc_LShift, sc_Space, sc_1, sc_2, sc_3, sc_4};
-int buttongamecontroller[gcbt_Max] = {bt_use,      bt_prevweapon, bt_nobutton, bt_nextweapon, bt_pause,    bt_nobutton,
+int buttongamecontroller[gcbt_Max] = {bt_use,      bt_nextweapon, bt_nobutton, bt_prevweapon, bt_pause,    bt_nobutton,
                                       bt_esc,      bt_nobutton,   bt_nobutton, bt_run,        bt_attack,   bt_nobutton,
                                       bt_nobutton, bt_nobutton,   bt_nobutton, bt_nobutton,   bt_nobutton, bt_nobutton,
                                       bt_nobutton, bt_nobutton,   bt_nobutton};
