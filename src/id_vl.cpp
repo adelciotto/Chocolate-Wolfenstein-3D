@@ -106,10 +106,10 @@ void VL_SetVGAPlaneMode(void)
     SDL_VL_SetPaletteColors(gamepal);
     memcpy(curpal, gamepal, sizeof(SDL_Color) * 256);
 
-    screenPitch = screen->pitch;
-    bufferPitch = indexedScreen->pitch;
+    screenPitch = g_screen->pitch;
+    bufferPitch = g_indexedScreen->pitch;
 
-    curSurface = indexedScreen;
+    curSurface = g_indexedScreen;
     curPitch = bufferPitch;
 
     scaleFactor = screenWidth / 320;
@@ -175,6 +175,7 @@ void VL_FillPalette(int red, int green, int blue)
 
 //===========================================================================
 
+#if 0 // Unused function
 /*
 =================
 =
@@ -183,8 +184,6 @@ void VL_FillPalette(int red, int green, int blue)
 =================
 */
 
-// Unused function
-#if 0
 void VL_SetColor(int color, int red, int green, int blue)
 {
     SDL_Color col = {red, green, blue};
@@ -203,6 +202,7 @@ void VL_SetColor(int color, int red, int green, int blue)
 
 //===========================================================================
 
+#if 0 // Unused function
 /*
 =================
 =
@@ -218,6 +218,7 @@ void VL_GetColor(int color, int *red, int *green, int *blue)
     *green = col->g;
     *blue = col->b;
 }
+#endif
 
 //===========================================================================
 
@@ -234,7 +235,7 @@ void VL_SetPalette(SDL_Color *palette, bool forceupdate)
     memcpy(curpal, palette, sizeof(SDL_Color) * 256);
 
     SDL_VL_SetPaletteColors(palette);
-    SDL_VL_SetSurfacePalette(indexedScreen);
+    SDL_VL_SetSurfacePalette(g_indexedScreen);
 
     if (forceupdate)
     {

@@ -38,33 +38,10 @@ volatile boolean Keyboard[SDL_NUM_SCANCODES];
 volatile boolean Paused;
 volatile char LastASCII;
 volatile ScanCode LastScan;
-
-// KeyboardDef   KbdDefs = {0x1d,0x38,0x47,0x48,0x49,0x4b,0x4d,0x4f,0x50,0x51};
-static KeyboardDef KbdDefs = {
-    sc_Control,    // button0
-    sc_Alt,        // button1
-    sc_Home,       // upleft
-    sc_UpArrow,    // up
-    sc_PgUp,       // upright
-    sc_LeftArrow,  // left
-    sc_RightArrow, // right
-    sc_End,        // downleft
-    sc_DownArrow,  // down
-    sc_PgDn        // downright
-};
-
-static SDL_Joystick *Joystick;
-int JoyNumButtons;
-static int JoyNumHats;
-
 bool GameControllerButtons[gcbt_Max];
-int GameControllerLeftStickX = 0;
-int GameControllerLeftStickY = 0;
-int GameControllerRightStickX = 0;
-int GameControllerRightStickY = 0;
-static SDL_GameController *GameController = nullptr;
-
-static bool GrabInput = false;
+int GameControllerLeftStick[2] = {0, 0};
+int GameControllerRightStick[2] = {0, 0};
+int JoyNumButtons;
 
 /*
 =============================================================================
@@ -109,6 +86,24 @@ byte SpecialNames[] = // ASCII for 0xe0 prefixed codes
         0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0,  0, 0, 0, // 6
         0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0,  0, 0, 0  // 7
 };
+
+static KeyboardDef KbdDefs = {
+    sc_Control,    // button0
+    sc_Alt,        // button1
+    sc_Home,       // upleft
+    sc_UpArrow,    // up
+    sc_PgUp,       // upright
+    sc_LeftArrow,  // left
+    sc_RightArrow, // right
+    sc_End,        // downleft
+    sc_DownArrow,  // down
+    sc_PgDn        // downright
+};
+
+static SDL_Joystick *Joystick;
+static int JoyNumHats;
+static SDL_GameController *GameController = nullptr;
+static bool GrabInput = false;
 
 static boolean IN_Started;
 
@@ -181,6 +176,7 @@ void IN_GetJoyDelta(int *dx, int *dy)
     *dy = y;
 }
 
+#if 0 // Unused function
 ///////////////////////////////////////////////////////////////////////////
 //
 //  IN_GetJoyFineDelta() - Returns the relative movement of the specified
@@ -213,6 +209,7 @@ void IN_GetJoyFineDelta(int *dx, int *dy)
     *dx = x;
     *dy = y;
 }
+#endif
 
 /*
 ===================
@@ -389,13 +386,13 @@ static void processEvent(SDL_Event *event)
         if (GameController)
         {
             if (event->caxis.axis == SDL_CONTROLLER_AXIS_LEFTX)
-                GameControllerLeftStickX = event->caxis.value >> 8;
+                GameControllerLeftStick[0] = event->caxis.value >> 8;
             if (event->caxis.axis == SDL_CONTROLLER_AXIS_LEFTY)
-                GameControllerLeftStickY = event->caxis.value >> 8;
+                GameControllerLeftStick[1] = event->caxis.value >> 8;
             if (event->caxis.axis == SDL_CONTROLLER_AXIS_RIGHTX)
-                GameControllerRightStickX = event->caxis.value >> 8;
+                GameControllerRightStick[0] = event->caxis.value >> 8;
             if (event->caxis.axis == SDL_CONTROLLER_AXIS_RIGHTY)
-                GameControllerRightStickY = event->caxis.value >> 8;
+                GameControllerRightStick[1] = event->caxis.value >> 8;
 
             if (event->caxis.axis == SDL_CONTROLLER_AXIS_TRIGGERLEFT)
                 GameControllerButtons[gcbt_LeftShoulder] = event->caxis.value == 32767;
@@ -530,14 +527,14 @@ void IN_ReadControl(int player, ControlInfo *info)
     else if (GameControllerButtons[gcbt_DpadRight])
         my = motion_Right;
 
-    if (GameControllerLeftStickY < -SENSITIVE)
+    if (GameControllerLeftStick[1] < -SENSITIVE)
         my = motion_Up;
-    else if (GameControllerLeftStickY > SENSITIVE)
+    else if (GameControllerLeftStick[1] > SENSITIVE)
         my = motion_Down;
 
-    if (GameControllerLeftStickX < -SENSITIVE)
+    if (GameControllerLeftStick[0] < -SENSITIVE)
         mx = motion_Left;
-    else if (GameControllerLeftStickX > SENSITIVE)
+    else if (GameControllerLeftStick[0] > SENSITIVE)
         mx = motion_Right;
 
     if (GameControllerButtons[gcbt_Start] || GameControllerButtons[gcbt_A])

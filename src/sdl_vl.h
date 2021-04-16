@@ -7,8 +7,8 @@
 
 #include "SDL.h"
 
-extern SDL_Surface *screen;
-extern SDL_Surface *indexedScreen;
+extern SDL_Surface *g_screen;
+extern SDL_Surface *g_indexedScreen;
 
 void SDL_VL_Init(const char *title, uint32_t width, uint32_t height, uint32_t scaledWidth, uint32_t scaledHeight,
                  int bpp, bool fullscreen);

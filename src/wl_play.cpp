@@ -300,19 +300,19 @@ void PollGameControllerMove(void)
 {
     int delta = buttonstate[bt_run] ? RUNMOVE * tics : BASEMOVE * tics;
 
-    if (GameControllerRightStickX > 64)
+    if (GameControllerRightStick[0] > 64)
         controlx += delta;
-    else if (GameControllerRightStickX < -64)
+    else if (GameControllerRightStick[0] < -64)
         controlx -= delta;
 
-    if (GameControllerLeftStickY > 64)
+    if (GameControllerLeftStick[1] > 64)
         controly += delta;
-    else if (GameControllerLeftStickY < -64)
+    else if (GameControllerLeftStick[1] < -64)
         controly -= delta;
 
-    if (GameControllerLeftStickX > 64)
+    if (GameControllerLeftStick[0] > 64)
         controlstrafe += delta;
-    else if (GameControllerLeftStickX < -64)
+    else if (GameControllerLeftStick[0] < -64)
         controlstrafe -= delta;
 }
 

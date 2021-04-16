@@ -358,7 +358,7 @@ boolean FizzleFade(SDL_Surface *source, int x1, int y1, unsigned width, unsigned
             return true;
         }
 
-        byte *destptr = VL_LockSurface(screen);
+        byte *destptr = VL_LockSurface(g_screen);
 
         rndval = lastrndval;
 
@@ -396,14 +396,14 @@ boolean FizzleFade(SDL_Surface *source, int x1, int y1, unsigned width, unsigned
 
                 if (screenBits == 8)
                 {
-                    *(destptr + (y1 + y) * screen->pitch + x1 + x) = *(srcptr + (y1 + y) * source->pitch + x1 + x);
+                    *(destptr + (y1 + y) * g_screen->pitch + x1 + x) = *(srcptr + (y1 + y) * source->pitch + x1 + x);
                 }
                 else
                 {
                     byte col = *(srcptr + (y1 + y) * source->pitch + x1 + x);
-                    uint32_t fullcol = SDL_MapRGB(screen->format, curpal[col].r, curpal[col].g, curpal[col].b);
-                    memcpy(destptr + (y1 + y) * screen->pitch + (x1 + x) * screen->format->BytesPerPixel, &fullcol,
-                           screen->format->BytesPerPixel);
+                    uint32_t fullcol = SDL_MapRGB(g_screen->format, curpal[col].r, curpal[col].g, curpal[col].b);
+                    memcpy(destptr + (y1 + y) * g_screen->pitch + (x1 + x) * g_screen->format->BytesPerPixel, &fullcol,
+                           g_screen->format->BytesPerPixel);
                 }
 
                 if (rndval == 0) // entire sequence has been completed
@@ -418,7 +418,7 @@ boolean FizzleFade(SDL_Surface *source, int x1, int y1, unsigned width, unsigned
         if (usedoublebuffering)
             first = 0;
 
-        VL_UnlockSurface(screen);
+        VL_UnlockSurface(g_screen);
         SDL_VL_Present();
 
         frame++;
@@ -427,7 +427,7 @@ boolean FizzleFade(SDL_Surface *source, int x1, int y1, unsigned width, unsigned
 
 finished:
     VL_UnlockSurface(source);
-    VL_UnlockSurface(screen);
+    VL_UnlockSurface(g_screen);
     SDL_VL_BlitIndexedSurfaceToScreen();
     SDL_VL_Present();
     return false;

@@ -89,65 +89,7 @@ typedef int ScanCode;
 #define sc_X SDL_SCANCODE_X
 #define sc_Y SDL_SCANCODE_Y
 #define sc_Z SDL_SCANCODE_Z
-
 #define key_None 0
-
-typedef enum
-{
-    demo_Off,
-    demo_Record,
-    demo_Playback,
-    demo_PlayDone
-} Demo;
-typedef enum
-{
-    ctrl_Keyboard,
-    ctrl_Keyboard1 = ctrl_Keyboard,
-    ctrl_Keyboard2,
-    ctrl_Joystick,
-    ctrl_Joystick1 = ctrl_Joystick,
-    ctrl_Joystick2,
-    ctrl_Mouse
-} ControlType;
-typedef enum
-{
-    motion_Left = -1,
-    motion_Up = -1,
-    motion_None = 0,
-    motion_Right = 1,
-    motion_Down = 1
-} Motion;
-typedef enum
-{
-    dir_North,
-    dir_NorthEast,
-    dir_East,
-    dir_SouthEast,
-    dir_South,
-    dir_SouthWest,
-    dir_West,
-    dir_NorthWest,
-    dir_None
-} Direction;
-typedef struct
-{
-    boolean button0, button1, button2, button3;
-    short x, y;
-    Motion xaxis, yaxis;
-    Direction dir;
-} CursorInfo;
-typedef CursorInfo ControlInfo;
-typedef struct
-{
-    ScanCode button0, button1, upleft, up, upright, left, right, downleft, down, downright;
-} KeyboardDef;
-typedef struct
-{
-    word joyMinX, joyMinY, threshMinX, threshMinY, threshMaxX, threshMaxY, joyMaxX, joyMaxY, joyMultXL, joyMultYL,
-        joyMultXH, joyMultYH;
-} JoystickDef;
-// Global variables
-extern volatile boolean Keyboard[];
 
 #define gcbt_None SDL_CONTROLLER_BUTTON_INVALID
 #define gcbt_A SDL_CONTROLLER_BUTTON_A
@@ -166,10 +108,80 @@ extern volatile boolean Keyboard[];
 #define gcbt_DpadLeft SDL_CONTROLLER_BUTTON_DPAD_LEFT
 #define gcbt_DpadRight SDL_CONTROLLER_BUTTON_DPAD_RIGHT
 #define gcbt_Max SDL_CONTROLLER_BUTTON_MAX
-extern bool GameControllerButtons[gcbt_Max];
-extern int GameControllerLeftStickX, GameControllerLeftStickY;
-extern int GameControllerRightStickX, GameControllerRightStickY;
 
+#if 0 // Unused enum
+typedef enum
+{
+    demo_Off,
+    demo_Record,
+    demo_Playback,
+    demo_PlayDone
+} Demo;
+#endif
+
+#if 0 // Unused enum
+typedef enum
+{
+    ctrl_Keyboard,
+    ctrl_Keyboard1 = ctrl_Keyboard,
+    ctrl_Keyboard2,
+    ctrl_Joystick,
+    ctrl_Joystick1 = ctrl_Joystick,
+    ctrl_Joystick2,
+    ctrl_Mouse
+} ControlType;
+#endif
+
+typedef enum
+{
+    motion_Left = -1,
+    motion_Up = -1,
+    motion_None = 0,
+    motion_Right = 1,
+    motion_Down = 1
+} Motion;
+
+typedef enum
+{
+    dir_North,
+    dir_NorthEast,
+    dir_East,
+    dir_SouthEast,
+    dir_South,
+    dir_SouthWest,
+    dir_West,
+    dir_NorthWest,
+    dir_None
+} Direction;
+
+typedef struct
+{
+    boolean button0, button1, button2, button3;
+    short x, y;
+    Motion xaxis, yaxis;
+    Direction dir;
+} CursorInfo;
+
+typedef CursorInfo ControlInfo;
+
+typedef struct
+{
+    ScanCode button0, button1, upleft, up, upright, left, right, downleft, down, downright;
+} KeyboardDef;
+
+#if 0 // Unused struct
+typedef struct
+{
+    word joyMinX, joyMinY, threshMinX, threshMinY, threshMaxX, threshMaxY, joyMaxX, joyMaxY, joyMultXL, joyMultYL,
+        joyMultXH, joyMultYH;
+} JoystickDef;
+#endif
+
+// Global variables
+extern volatile boolean Keyboard[];
+extern bool GameControllerButtons[gcbt_Max];
+extern int GameControllerLeftStick[2];
+extern int GameControllerRightStick[2];
 extern boolean MousePresent;
 extern volatile boolean Paused;
 extern volatile char LastASCII;

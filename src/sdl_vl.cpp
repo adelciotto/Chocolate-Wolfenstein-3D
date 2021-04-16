@@ -6,8 +6,8 @@
 
 #define PIXEL_FORMAT SDL_PIXELFORMAT_ARGB8888
 
-SDL_Surface *screen = NULL;
-SDL_Surface *indexedScreen = NULL;
+SDL_Surface *g_screen = NULL;
+SDL_Surface *g_indexedScreen = NULL;
 
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
@@ -52,21 +52,21 @@ void SDL_VL_Init(const char *title, uint32_t width, uint32_t height, uint32_t sc
     }
 
     // Create the indexed screen surface which the game will draw into using a color palette.
-    indexedScreen = SDL_CreateRGBSurface(0, width, height, 8, 0, 0, 0, 0);
-    if (!indexedScreen)
+    g_indexedScreen = SDL_CreateRGBSurface(0, width, height, 8, 0, 0, 0, 0);
+    if (!g_indexedScreen)
     {
         printf("Unable to create indexed surface: %s\n", SDL_GetError());
         goto error;
     }
-    SDL_SetSurfacePalette(indexedScreen, colorPalette);
+    SDL_SetSurfacePalette(g_indexedScreen, colorPalette);
 
     // Create the screen surface which will contain a 32bit ARGB version of the indexed screen.
     rmask = 0x00ff0000;
     gmask = 0x0000ff00;
     bmask = 0x000000ff;
     amask = 0xff000000;
-    screen = SDL_CreateRGBSurface(0, width, height, bpp, rmask, gmask, bmask, amask);
-    if (!screen)
+    g_screen = SDL_CreateRGBSurface(0, width, height, bpp, rmask, gmask, bmask, amask);
+    if (!g_screen)
     {
         printf("Unable to create screen surface: %s\n", SDL_GetError());
         goto error;
@@ -106,11 +106,11 @@ void SDL_VL_Destroy()
     if (screenTexture)
         SDL_DestroyTexture(screenTexture);
 
-    if (screen)
-        SDL_FreeSurface(screen);
+    if (g_screen)
+        SDL_FreeSurface(g_screen);
 
-    if (indexedScreen)
-        SDL_FreeSurface(indexedScreen);
+    if (g_indexedScreen)
+        SDL_FreeSurface(g_indexedScreen);
 
     if (colorPalette)
         SDL_FreePalette(colorPalette);
@@ -134,12 +134,12 @@ void SDL_VL_SetSurfacePalette(SDL_Surface *surface)
 
 void SDL_VL_BlitIndexedSurfaceToScreen()
 {
-    SDL_BlitSurface(indexedScreen, NULL, screen, NULL);
+    SDL_BlitSurface(g_indexedScreen, NULL, g_screen, NULL);
 }
 
 void SDL_VL_Present()
 {
-    SDL_UpdateTexture(screenTexture, NULL, screen->pixels, screen->pitch);
+    SDL_UpdateTexture(screenTexture, NULL, g_screen->pixels, g_screen->pitch);
     SDL_RenderClear(renderer);
 
     // Render the intermediate texture into the up-scaled texture using 'nearest' integer scaling.
