@@ -1088,9 +1088,6 @@ static void InitGame()
 #endif
 
     // initialize SDL
-#if defined _WIN32
-    putenv("SDL_VIDEODRIVER=directx");
-#endif
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER) < 0)
     {
         printf("Unable to init SDL: %s\n", SDL_GetError());
@@ -1110,6 +1107,7 @@ static void InitGame()
 
     SignonScreen();
 
+#if 0
 #if defined _WIN32
     if (!fullscreen)
     {
@@ -1124,6 +1122,7 @@ static void InitGame()
             SetWindowPos(hwndSDL, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
         }
     }
+#endif
 #endif
 
     VH_Startup();

@@ -3,6 +3,7 @@
 //
 
 #include "sdl_vl.h"
+#include <stdio.h>
 
 #define PIXEL_FORMAT SDL_PIXELFORMAT_ARGB8888
 
@@ -25,7 +26,7 @@ void SDL_VL_Init(const char *title, uint32_t width, uint32_t height, uint32_t sc
                               SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
     if (!window)
     {
-        printf("Unable to create SDL_Window %ix%i: %s\n", scaledWidth, scaledHeight, SDL_GetError());
+        fprintf(stderr, "Unable to create SDL_Window %ix%i: %s\n", scaledWidth, scaledHeight, SDL_GetError());
         goto error;
     }
     if (fullscreen)
@@ -37,7 +38,7 @@ void SDL_VL_Init(const char *title, uint32_t width, uint32_t height, uint32_t sc
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (!renderer)
     {
-        printf("Unable to create SDL_Renderer: %s\n", SDL_GetError());
+        fprintf(stderr, "Unable to create SDL_Renderer: %s\n", SDL_GetError());
         goto error;
     }
     SDL_RenderSetLogicalSize(renderer, scaledWidth, scaledHeight);
@@ -47,7 +48,7 @@ void SDL_VL_Init(const char *title, uint32_t width, uint32_t height, uint32_t sc
     colorPalette = SDL_AllocPalette(256);
     if (!colorPalette)
     {
-        printf("Unable to allocate SDL_Palette: %s\n", SDL_GetError());
+        fprintf(stderr, "Unable to allocate SDL_Palette: %s\n", SDL_GetError());
         goto error;
     }
 
@@ -55,7 +56,7 @@ void SDL_VL_Init(const char *title, uint32_t width, uint32_t height, uint32_t sc
     g_indexedScreen = SDL_CreateRGBSurface(0, width, height, 8, 0, 0, 0, 0);
     if (!g_indexedScreen)
     {
-        printf("Unable to create indexed surface: %s\n", SDL_GetError());
+        fprintf(stderr, "Unable to create indexed surface: %s\n", SDL_GetError());
         goto error;
     }
     SDL_SetSurfacePalette(g_indexedScreen, colorPalette);
@@ -68,7 +69,7 @@ void SDL_VL_Init(const char *title, uint32_t width, uint32_t height, uint32_t sc
     g_screen = SDL_CreateRGBSurface(0, width, height, bpp, rmask, gmask, bmask, amask);
     if (!g_screen)
     {
-        printf("Unable to create screen surface: %s\n", SDL_GetError());
+        fprintf(stderr, "Unable to create screen surface: %s\n", SDL_GetError());
         goto error;
     }
 
@@ -77,7 +78,7 @@ void SDL_VL_Init(const char *title, uint32_t width, uint32_t height, uint32_t sc
     screenTexture = SDL_CreateTexture(renderer, PIXEL_FORMAT, SDL_TEXTUREACCESS_STREAMING, width, height);
     if (!screenTexture)
     {
-        printf("Unable to create screen texture: %s\n", SDL_GetError());
+        fprintf(stderr, "Unable to create screen texture: %s\n", SDL_GetError());
         exit(1);
     }
 
@@ -87,7 +88,7 @@ void SDL_VL_Init(const char *title, uint32_t width, uint32_t height, uint32_t sc
     scaledTexture = SDL_CreateTexture(renderer, PIXEL_FORMAT, SDL_TEXTUREACCESS_TARGET, scaledWidth, scaledHeight);
     if (!scaledTexture)
     {
-        printf("Unable to create scaled texture: %s\n", SDL_GetError());
+        fprintf(stderr, "Unable to create scaled texture: %s\n", SDL_GetError());
         goto error;
     }
 
