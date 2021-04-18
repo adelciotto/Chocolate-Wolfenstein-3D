@@ -12,8 +12,9 @@ other small changes.
     * When using a modern game controller, the game supports moving and strafing at the same time. 
 
 This is still a WIP. Things I'm planning to do:
-- [ ] Detailed instructions for how to build for each platform (via command line, and CLion IDE).
-- [ ] Ports to other platforms/game consoles (PSP, PS Vita, etc).
+- [ ] Use SDL2 built in logging for showing platform info/errors in console and files.
+- [ ] Make data file loading case insensitive.
+- [ ] Ports to other platforms/game consoles (Serenity, PSP, PS Vita, etc).
 
 ## Build & Run
 
@@ -92,7 +93,39 @@ Be sure to generate the CMake cache and select `Chocolate-Wolfenstein-3D.exe` as
 
 ### Linux
 
-TODO!
+These instructions assume you are using Ubuntu. If you're on a different distribution, ensure you have the 
+dependencies installed and the instructions should be identical.
+
+Install all of the required dependencies:
+
+```shell
+sudo apt update
+sudo apt install cmake libsdl2-dev libsdl2-mixer-dev
+```
+
+Navigate to the cloned repository and generate the build files:
+
+```shell
+mkdir build && cd build
+cmake ..
+```
+
+Compile the game:
+
+```shell
+make -j4
+```
+
+Run the game:
+
+```shell
+./Chocolate-Wolfenstein-3D
+```
+
+## Hacking
+
+If you want to modify the source and debug the game, then using an IDE that supports CMake is the easiest way.
+I personally use CLion, but on Windows Visual Studio 2019 works well too.
 
 ## Play
 
