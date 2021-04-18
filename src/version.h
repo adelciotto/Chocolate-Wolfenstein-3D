@@ -8,7 +8,7 @@
 //#define SPEAR
 //#define SPEARDEMO
 #define UPLOAD
-//#define GOODTIMES
+#define GOODTIMES
 #define CARMACIZED
 //#define APOGEE_1_0
 //#define APOGEE_1_1

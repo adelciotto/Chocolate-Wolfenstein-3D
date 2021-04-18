@@ -41,12 +41,17 @@ The data files can have the following extensions:
 * .SD3 - Wolfenstein 3D Spear of Destiny Mission 3: Ultimate Challenge
 
 You will need to ensure the game is configured for your version of the data files. You can do this by enabling specific
-definitions in the `version.h` file, which has some comments with instructions about what to configure. By default the game is configured for the `.WL1` and `.WL6` data files.
+definitions in the `version.h` file, which has some comments with instructions about what to configure. By default the game is configured for the `.WL1`
+shareware data files. If you have the `.WL6` files for the full game, then only `GOODTIMES` and `CARMACIZED` should be defined.
+
+*Note: If the data files are available to the executable, but the game still complains it can't load them. Try converting
+them all to lowercase (including the extension e.g VSWAP.WL1 -> vswap.wl1). I'll patch the game to normalize the case soon
+so this won't be a problem.*
 
 If you don't have data files, here are some links:
 * [Shareware files for Wolfenstein 3D](http://maniacsvault.net/ecwolf/files/shareware/wolf3d14.zip)
 * [Shareware files for Spear of Destiny](http://maniacsvault.net/ecwolf/files/shareware/soddemo.zip)
-* [Purchases the full game](https://www.gog.com/game/wolfenstein_3d_and_spear_of_destiny?pp=979014556ab8cdd13048702896fb99fcc40fe793)
+* [Purchase the full game](https://www.gog.com/game/wolfenstein_3d_and_spear_of_destiny?pp=979014556ab8cdd13048702896fb99fcc40fe793)
 
 ### OSX
 
@@ -59,7 +64,7 @@ brew update
 brew install cmake sdl2 sdl2_mixer
 ```
 
-Generate the build files:
+Navigate to the cloned repository and generate the build files:
 
 ```shell
 mkdir build && cd build
@@ -80,7 +85,10 @@ Run the game:
 
 ### Windows
 
-TODO!
+Visual Studio 2019 for C++ has built-in support for CMake projects. So directly opening the project in Visual Studio
+and building from there is easiest. If you don't have it you can install it from [here](https://visualstudio.microsoft.com/vs/).
+
+Be sure to generate the CMake cache and select `Chocolate-Wolfenstein-3D.exe` as the target.
 
 ### Linux
 
