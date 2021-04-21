@@ -1090,40 +1090,26 @@ static void InitGame()
     // initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER) < 0)
     {
-        printf("Unable to init SDL: %s\n", SDL_GetError());
+        LOG_Errorf("Unable to init SDL: %s", SDL_GetError());
         exit(1);
     }
     atexit(SDL_Quit);
+
+    SDL_version version;
+    SDL_VERSION(&version);
+    LOG_Infof("SDL version %d.%d.%d initialized", version.major, version.minor, version.patch);
 
     int numJoysticks = SDL_NumJoysticks();
     if (param_joystickindex && (param_joystickindex < -1 || param_joystickindex >= numJoysticks))
     {
         if (!numJoysticks)
-            printf("No joysticks are available to SDL!\n");
+            LOG_Infof("No joysticks are available to SDL!");
         else
-            printf("The joystick index must be between -1 and %i!\n", numJoysticks - 1);
+            LOG_Warnf("The joystick index must be between -1 and %i!", numJoysticks - 1);
         exit(1);
     }
 
     SignonScreen();
-
-#if 0
-#if defined _WIN32
-    if (!fullscreen)
-    {
-        struct SDL_SysWMinfo wmInfo;
-        SDL_VERSION(&wmInfo.version);
-
-        if (SDL_GetWMInfo(&wmInfo) != -1)
-        {
-            HWND hwndSDL = wmInfo.window;
-            DWORD style = GetWindowLong(hwndSDL, GWL_STYLE) & ~WS_SYSMENU;
-            SetWindowLong(hwndSDL, GWL_STYLE, style);
-            SetWindowPos(hwndSDL, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
-        }
-    }
-#endif
-#endif
 
     VH_Startup();
     IN_Startup();
@@ -1313,7 +1299,7 @@ void Quit(const char *errorStr, ...)
 #ifdef NOTYET
             SetTextCursor(0, 0);
 #endif
-            puts(error);
+            LOG_Errorf(error);
 #ifdef NOTYET
             SetTextCursor(0, 2);
 #endif
@@ -1559,7 +1545,7 @@ void CheckParameters(int argc, char *argv[])
         {
             if (++i >= argc)
             {
-                printf("The tedlevel option is missing the level argument!\n");
+                LOG_Errorf("The tedlevel option is missing the level argument!");
                 hasError = true;
             }
             else
@@ -1575,54 +1561,11 @@ void CheckParameters(int argc, char *argv[])
         {
             screenScale2x = true;
         }
-        else IFARG("--bits")
-        {
-            if (++i >= argc)
-            {
-                printf("The bits option is missing the color depth argument!\n");
-                hasError = true;
-            }
-            else
-            {
-                screenBits = atoi(argv[i]);
-                switch (screenBits)
-                {
-                case 8:
-                case 16:
-                case 24:
-                case 32:
-                    break;
-
-                default:
-                    printf("Screen color depth must be 8, 16, 24, or 32!\n");
-                    hasError = true;
-                    break;
-                }
-            }
-        }
-        else IFARG("--nodblbuf") usedoublebuffering = false;
-        else IFARG("--extravbls")
-        {
-            if (++i >= argc)
-            {
-                printf("The extravbls option is missing the vbls argument!\n");
-                hasError = true;
-            }
-            else
-            {
-                extravbls = atoi(argv[i]);
-                if (extravbls < 0)
-                {
-                    printf("Extravbls must be positive!\n");
-                    hasError = true;
-                }
-            }
-        }
         else IFARG("--joystick")
         {
             if (++i >= argc)
             {
-                printf("The joystick option is missing the index argument!\n");
+                LOG_Errorf("The joystick option is missing the index argument!");
                 hasError = true;
             }
             else
@@ -1632,7 +1575,7 @@ void CheckParameters(int argc, char *argv[])
         {
             if (++i >= argc)
             {
-                printf("The joystickhat option is missing the index argument!\n");
+                LOG_Errorf("The joystickhat option is missing the index argument!");
                 hasError = true;
             }
             else
@@ -1642,7 +1585,7 @@ void CheckParameters(int argc, char *argv[])
         {
             if (++i >= argc)
             {
-                printf("The samplerate option is missing the rate argument!\n");
+                LOG_Errorf("The samplerate option is missing the rate argument!");
                 hasError = true;
             }
             else
@@ -1653,7 +1596,7 @@ void CheckParameters(int argc, char *argv[])
         {
             if (++i >= argc)
             {
-                printf("The audiobuffer option is missing the size argument!\n");
+                LOG_Errorf("The audiobuffer option is missing the size argument!");
                 hasError = true;
             }
             else
@@ -1664,7 +1607,7 @@ void CheckParameters(int argc, char *argv[])
         {
             if (++i >= argc)
             {
-                printf("The mission option is missing the mission argument!\n");
+                LOG_Errorf("The mission option is missing the mission argument!");
                 hasError = true;
             }
             else
@@ -1672,7 +1615,7 @@ void CheckParameters(int argc, char *argv[])
                 param_mission = atoi(argv[i]);
                 if (param_mission < 0 || param_mission > 3)
                 {
-                    printf("The mission option must be between 0 and 3!\n");
+                    LOG_Errorf("The mission option must be between 0 and 3!");
                     hasError = true;
                 }
             }
@@ -1681,7 +1624,7 @@ void CheckParameters(int argc, char *argv[])
         {
             if (++i >= argc)
             {
-                printf("The configdir option is missing the dir argument!\n");
+                LOG_Errorf("The configdir option is missing the dir argument!");
                 hasError = true;
             }
             else
@@ -1689,7 +1632,7 @@ void CheckParameters(int argc, char *argv[])
                 size_t len = strlen(argv[i]);
                 if (len + 2 > sizeof(configdir))
                 {
-                    printf("The config directory is too long!\n");
+                    LOG_Errorf("The config directory is too long!");
                     hasError = true;
                 }
                 else
@@ -1705,7 +1648,7 @@ void CheckParameters(int argc, char *argv[])
         else IFARG("--help") showHelp = true;
         else
         {
-            printf("Unrecognized parameter: %s\n", arg);
+            LOG_Errorf("Unrecognized parameter: %s", arg);
         }
     }
     if (showHelp || hasError)
@@ -1727,7 +1670,6 @@ void CheckParameters(int argc, char *argv[])
                " --windowed[-mouse]     Starts the game in a window [and grabs "
                "mouse]\n"
                " --scale2x              Scale the game resolution by 2\n"
-               " --bits <b>             Sets the screen color depth\n"
                "                        (use this when you have palette/fading "
                "problems\n"
                "                        allowed: 8, 16, 24, 32, default: \"best\" "
@@ -1786,6 +1728,7 @@ void CheckParameters(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
+    LOG_Infof("Starting Chocolate Wolfenstein 3D!");
 
     CheckParameters(argc, argv);
 

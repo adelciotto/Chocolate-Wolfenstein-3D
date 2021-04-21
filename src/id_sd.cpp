@@ -597,13 +597,13 @@ int SD_PlayDigitized(word which, int leftpos, int rightpos)
     Mix_Chunk *sample = SoundChunks[which];
     if (sample == NULL)
     {
-        printf("SoundChunks[%i] is NULL!\n", which);
+        LOG_Errorf("SoundChunks[%i] is NULL!", which);
         return 0;
     }
 
     if (Mix_PlayChannel(channel, sample, 0) == -1)
     {
-        printf("Unable to play sound: %s\n", Mix_GetError());
+        LOG_Errorf("Unable to play sound: %s", Mix_GetError());
         return 0;
     }
 
@@ -1055,7 +1055,7 @@ void SD_Startup(void)
 
     if (Mix_OpenAudio(param_samplerate, AUDIO_S16, 2, param_audiobuffer))
     {
-        printf("Unable to open audio: %s\n", Mix_GetError());
+        LOG_Errorf("Unable to open audio: %s", Mix_GetError());
         return;
     }
 
@@ -1068,7 +1068,7 @@ void SD_Startup(void)
 
     if (YM3812Init(1, 3579545, param_samplerate))
     {
-        printf("Unable to create virtual OPL!!\n");
+        LOG_Errorf("Unable to create virtual OPL!!");
     }
 
     for (i = 1; i < 0xf6; i++)

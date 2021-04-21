@@ -363,6 +363,7 @@ static void processEvent(SDL_Event *event)
             if (SDL_IsGameController(id))
             {
                 GameController = SDL_GameControllerOpen(id);
+                LOG_Infof("SDL GameController '%s' connected", SDL_GameControllerName(GameController));
             }
         }
         break;
@@ -370,6 +371,7 @@ static void processEvent(SDL_Event *event)
     case SDL_CONTROLLERDEVICEREMOVED: {
         if (GameController)
         {
+            LOG_Infof("SDL GameController '%s' disconnected", SDL_GameControllerName(GameController));
             SDL_GameControllerClose(GameController);
             GameController = nullptr;
         }
@@ -482,6 +484,8 @@ void IN_Shutdown(void)
 
     if (GameController)
         SDL_GameControllerClose(GameController);
+
+    LOG_Infof("SDL Joystick and GameController resources destroyed");
 
     IN_Started = false;
 }

@@ -6,7 +6,8 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 # Add all the cpp sources files.
 file(GLOB SOURCE_FILES "src/*.cpp")
-add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+file(GLOB HEADER_FILES "src/*.h")
+add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
 
 # Set the C++ standard and compiler flags.
 set(CMAKE_CXX_STANDARD 11)

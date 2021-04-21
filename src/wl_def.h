@@ -51,6 +51,8 @@
 #include "gfxv_sod.h"
 #endif
 
+#include "log.h"
+
 typedef uint8_t byte;
 typedef uint16_t word;
 typedef int32_t fixed;

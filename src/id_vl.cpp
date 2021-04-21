@@ -101,7 +101,7 @@ void VL_SetVGAPlaneMode(void)
         scaledScreenHeight *= 2;
     }
 
-    SDL_VL_Init(title, screenWidth, screenHeight, scaledScreenWidth, scaledScreenHeight, screenBits, fullscreen);
+    SDL_VL_Init(title, screenWidth, screenHeight, scaledScreenWidth, scaledScreenHeight, fullscreen);
 
     SDL_VL_SetPaletteColors(gamepal);
     memcpy(curpal, gamepal, sizeof(SDL_Color) * 256);

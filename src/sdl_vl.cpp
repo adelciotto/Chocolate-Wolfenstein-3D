@@ -3,7 +3,7 @@
 //
 
 #include "sdl_vl.h"
-#include <stdio.h>
+#include "log.h"
 
 #define PIXEL_FORMAT SDL_PIXELFORMAT_ARGB8888
 
@@ -17,7 +17,7 @@ static SDL_Texture *scaledTexture = NULL;
 static SDL_Palette *colorPalette = NULL;
 
 void SDL_VL_Init(const char *title, uint32_t width, uint32_t height, uint32_t scaledWidth, uint32_t scaledHeight,
-                 int bpp, bool fullscreen)
+                 bool fullscreen)
 {
     uint32_t rmask, gmask, bmask, amask;
 
@@ -26,19 +26,24 @@ void SDL_VL_Init(const char *title, uint32_t width, uint32_t height, uint32_t sc
                               SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
     if (!window)
     {
-        fprintf(stderr, "Unable to create SDL_Window %ix%i: %s\n", scaledWidth, scaledHeight, SDL_GetError());
+        LOG_Errorf("Unable to create SDL_Window %ix%i: %s", scaledWidth, scaledHeight, SDL_GetError());
         goto error;
     }
+
     if (fullscreen)
     {
         SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+
+        int w, h;
+        SDL_GetWindowSize(window, &w, &h);
+        LOG_Infof("SDL window set to fullscreen with size: %dx%d", w, h);
     }
 
     // Create the SDL Renderer.
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (!renderer)
     {
-        fprintf(stderr, "Unable to create SDL_Renderer: %s\n", SDL_GetError());
+        LOG_Errorf("Unable to create SDL_Renderer: %s", SDL_GetError());
         goto error;
     }
     SDL_RenderSetLogicalSize(renderer, scaledWidth, scaledHeight);
@@ -48,7 +53,7 @@ void SDL_VL_Init(const char *title, uint32_t width, uint32_t height, uint32_t sc
     colorPalette = SDL_AllocPalette(256);
     if (!colorPalette)
     {
-        fprintf(stderr, "Unable to allocate SDL_Palette: %s\n", SDL_GetError());
+        LOG_Errorf("Unable to allocate SDL_Palette: %s", SDL_GetError());
         goto error;
     }
 
@@ -56,7 +61,7 @@ void SDL_VL_Init(const char *title, uint32_t width, uint32_t height, uint32_t sc
     g_indexedScreen = SDL_CreateRGBSurface(0, width, height, 8, 0, 0, 0, 0);
     if (!g_indexedScreen)
     {
-        fprintf(stderr, "Unable to create indexed surface: %s\n", SDL_GetError());
+        LOG_Errorf("Unable to create indexed surface: %s", SDL_GetError());
         goto error;
     }
     SDL_SetSurfacePalette(g_indexedScreen, colorPalette);
@@ -66,10 +71,10 @@ void SDL_VL_Init(const char *title, uint32_t width, uint32_t height, uint32_t sc
     gmask = 0x0000ff00;
     bmask = 0x000000ff;
     amask = 0xff000000;
-    g_screen = SDL_CreateRGBSurface(0, width, height, bpp, rmask, gmask, bmask, amask);
+    g_screen = SDL_CreateRGBSurface(0, width, height, 32, rmask, gmask, bmask, amask);
     if (!g_screen)
     {
-        fprintf(stderr, "Unable to create screen surface: %s\n", SDL_GetError());
+        LOG_Errorf("Unable to create screen surface: %s", SDL_GetError());
         goto error;
     }
 
@@ -78,7 +83,7 @@ void SDL_VL_Init(const char *title, uint32_t width, uint32_t height, uint32_t sc
     screenTexture = SDL_CreateTexture(renderer, PIXEL_FORMAT, SDL_TEXTUREACCESS_STREAMING, width, height);
     if (!screenTexture)
     {
-        fprintf(stderr, "Unable to create screen texture: %s\n", SDL_GetError());
+        LOG_Errorf("Unable to create screen texture: %s", SDL_GetError());
         exit(1);
     }
 
@@ -88,9 +93,14 @@ void SDL_VL_Init(const char *title, uint32_t width, uint32_t height, uint32_t sc
     scaledTexture = SDL_CreateTexture(renderer, PIXEL_FORMAT, SDL_TEXTUREACCESS_TARGET, scaledWidth, scaledHeight);
     if (!scaledTexture)
     {
-        fprintf(stderr, "Unable to create scaled texture: %s\n", SDL_GetError());
+        LOG_Errorf("Unable to create scaled texture: %s", SDL_GetError());
         goto error;
     }
+
+    SDL_RendererInfo info;
+    SDL_GetRendererInfo(renderer, &info);
+    LOG_Infof("SDL renderer initialized. Driver: %s. Surface size: %dx%d. CRT Texture size: %dx%d", info.name, width,
+              height, scaledWidth, scaledHeight);
 
     return;
 
@@ -121,6 +131,8 @@ void SDL_VL_Destroy()
 
     if (window)
         SDL_DestroyWindow(window);
+
+    LOG_Infof("SDL window and renderer resources destroyed");
 }
 
 void SDL_VL_SetPaletteColors(SDL_Color *colors)
