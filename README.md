@@ -12,9 +12,8 @@ other small changes.
     * When using a modern game controller, the game supports moving and strafing at the same time. 
 
 This is still a WIP. Things I'm planning to do:
-- [ ] Use SDL2 built in logging for showing platform info/errors in console and files.
-- [ ] Make data file loading case insensitive.
 - [ ] Ports to other platforms/game consoles (Serenity, PSP, PS Vita, etc).
+- [ ] Configure graphics from the in-game menu (fullscreen, etc).
 
 ## Build & Run
 
@@ -23,31 +22,32 @@ This is still a WIP. Things I'm planning to do:
 First copy your Wolf3D data files into the `data` directory. The files needed are:
 
 ```
-AUDIOHED
-AUDIOT
-GAMEMAPS
-MAPHEAD
-VGADICT
-VGAGRAPH
-VGAHEAD
-VSWAP
+audiohed
+audiot
+gamemaps
+maphead
+vgadict
+vgagraph
+vgahead
+vswap
 ```
 
 The data files can have the following extensions:
 
-* .WL1 - Wolfenstein 3D shareware version (episode 1 only)
-* .WL6 - Wolfenstein 3D full version (episode 1 to 6)
-* .SOD - Wolfenstein 3D Spear of Destiny demo and full version
-* .SD2 - Wolfenstein 3D Spear of Destiny Mission 2: Return to Danger
-* .SD3 - Wolfenstein 3D Spear of Destiny Mission 3: Ultimate Challenge
+* .wl1 - Wolfenstein 3D shareware version (episode 1 only)
+* .wl6 - Wolfenstein 3D full version (episode 1 to 6)
+* .sod - Wolfenstein 3D Spear of Destiny demo and full version
+* .sd2 - Wolfenstein 3D Spear of Destiny Mission 2: Return to Danger
+* .sd3 - Wolfenstein 3D Spear of Destiny Mission 3: Ultimate Challenge
 
 You will need to ensure the game is configured for your version of the data files. You can do this by enabling specific
-definitions in the `version.h` file, which has some comments with instructions about what to configure. By default the game is configured for the `.WL1`
-shareware data files. If you have the `.WL6` files for the full game, then only `GOODTIMES` and `CARMACIZED` should be defined.
+definitions in the `version.h` file, which has some comments with instructions about what to configure. By default, the
+game is configured for the `.wl1` shareware data files. If you have the `.wl6` files for the full game, then only
+`GOODTIMES` and `CARMACIZED` should be defined.
 
-*Note: If the data files are available to the executable, but the game still complains it can't load them. Try converting
-them all to lowercase (including the extension e.g VSWAP.WL1 -> vswap.wl1). I'll patch the game to normalize the case soon
-so this won't be a problem.*
+*Note: The game expects the data files to be in lowercase (e.g VSWAP.WL1 -> wswap.wl1). But if your computers filesystem is case
+in-sensitive then this won't matter. So if you have all the correct data files, but the game isn't loading them then try
+renaming them all to lowercase.*
 
 If you don't have data files, here are some links:
 * [Shareware files for Wolfenstein 3D](http://maniacsvault.net/ecwolf/files/shareware/wolf3d14.zip)
@@ -58,7 +58,7 @@ If you don't have data files, here are some links:
 
 These instructions assume you have Homebrew installed. If you don't, please [install](https://brew.sh/) it.
 
-Install all of the required dependencies:
+Install all the required dependencies:
 
 ```shell
 brew update
@@ -94,9 +94,9 @@ Be sure to generate the CMake cache and select `Chocolate-Wolfenstein-3D.exe` as
 ### Linux
 
 These instructions assume you are using Ubuntu. If you're on a different distribution, ensure you have the 
-dependencies installed and the instructions should be identical.
+dependencies installed, and the instructions should be identical.
 
-Install all of the required dependencies:
+Install all the required dependencies:
 
 ```shell
 sudo apt update
