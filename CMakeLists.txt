@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5.1)
-project(Chocolate-Wolfenstein-3D)
+project(chocolate-wolfenstein-3D)
 
 # Add the SDL2 CMake modules.
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)

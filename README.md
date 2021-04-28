@@ -1,7 +1,7 @@
-Chocolate-Wolfenstein-3D
+chocolate-wolfenstein-3D
 ========================
 
-![alt tag](screenshots/crt_aspect.png)
+![alt tag](screenshots/preview.png)
 
 This is a fork of Fabien Sanglard's [Chocolate-Wolfenstein-3D](https://github.com/fabiensanglard/Chocolate-Wolfenstein-3D) which upgrades the codebase to use SDL2 and makes some
 other small changes.
@@ -81,7 +81,7 @@ make -j4
 Run the game:
 
 ```shell
-./Chocolate-Wolfenstein-3D
+./chocolate-wolfenstein-3D
 ```
 
 ### Windows
@@ -119,7 +119,7 @@ make -j4
 Run the game:
 
 ```shell
-./Chocolate-Wolfenstein-3D
+./chocolate-wolfenstein-3D
 ```
 
 ## Hacking
