@@ -1557,10 +1557,6 @@ void CheckParameters(int argc, char *argv[])
             fullscreen = false;
             forcegrabmouse = true;
         }
-        else IFARG("--scale2x")
-        {
-            screenScale2x = true;
-        }
         else IFARG("--joystick")
         {
             if (++i >= argc)
@@ -1669,7 +1665,6 @@ void CheckParameters(int argc, char *argv[])
                " --nowait               Skips intro screens\n"
                " --windowed[-mouse]     Starts the game in a window [and grabs "
                "mouse]\n"
-               " --scale2x              Scale the game resolution by 2\n"
                "                        (use this when you have palette/fading "
                "problems\n"
                "                        allowed: 8, 16, 24, 32, default: \"best\" "

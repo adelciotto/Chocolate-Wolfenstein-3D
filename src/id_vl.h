@@ -21,7 +21,7 @@ void Quit(const char *error, ...);
 
 extern SDL_Surface *curSurface;
 
-extern boolean fullscreen, usedoublebuffering, screenScale2x;
+extern boolean fullscreen, usedoublebuffering;
 extern unsigned screenWidth, screenHeight, screenBits, screenPitch, bufferPitch, curPitch;
 extern unsigned scaleFactor;
 

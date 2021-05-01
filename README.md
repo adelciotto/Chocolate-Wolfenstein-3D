@@ -6,14 +6,18 @@ chocolate-wolfenstein-3D
 This is a fork of Fabien Sanglard's [Chocolate-Wolfenstein-3D](https://github.com/fabiensanglard/Chocolate-Wolfenstein-3D) which upgrades the codebase to use SDL2 and makes some
 other small changes.
 
-* Now using CMake for cross-platform builds.
-* Replaces OpenGL code with the SDL2 renderer for CRT emulation.
+* Enhanced 640x400 display resolution which scales up to any screen size.
+* Corrects the aspect ratio to 4:3 (640x480) to emulate what gamers experienced in 1993.
 * Support for modern game controllers (Xbox, PS3/PS4, etc) via the SDL2 GameController API.
-    * When using a modern game controller, the game supports moving and strafing at the same time. 
+    * When using a modern game controller, the game supports moving and strafing at the same time.
+* Using CMake for cross-platform builds.
 
 This is still a WIP. Things I'm planning to do:
+- [ ] Modern keyboard and mouse controls (WASD movement, mouse to turn).
+- [ ] Emulation of DOS launcher for Spear of Destiny which allows you to select episode.
+- [ ] Package Wolf3D and SOD for all pc platforms via CMake.
+- [ ] Configure graphics from the in-game menu (fullscreen, video scale, etc).
 - [ ] Ports to other platforms/game consoles (Serenity, PSP, PS Vita, etc).
-- [ ] Configure graphics from the in-game menu (fullscreen, etc).
 
 ## Build & Run
 
@@ -135,7 +139,6 @@ I personally use CLion, but on Windows Visual Studio 2019 works well too.
 :-----:|:-----:
 --help|Show all command line options.
 --windowed|Run the game in a window.
-—-scale2x|Run the game at double the resolution.
 --tedlevel <level>|Starts the game in the given level
 --baby|Sets the difficulty to baby for tedlevel
 --easy|Sets the difficulty to easy for tedlevel

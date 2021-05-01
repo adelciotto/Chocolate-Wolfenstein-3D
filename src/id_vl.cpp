@@ -23,12 +23,9 @@
 boolean fullscreen = true;
 
 boolean usedoublebuffering = true;
-boolean screenScale2x = false;
-unsigned screenWidth = 320;
-unsigned screenHeight = 200;
+unsigned screenWidth = 640;
+unsigned screenHeight = 400;
 unsigned screenBits = 32;
-static unsigned scaledScreenWidth = 640;
-static unsigned scaledScreenHeight = 480;
 
 unsigned screenPitch;
 unsigned bufferPitch;
@@ -93,23 +90,15 @@ void VL_SetVGAPlaneMode(void)
     title = "Wolfenstein 3D";
 #endif
 
-    if (screenScale2x)
-    {
-        screenWidth *= 2;
-        screenHeight *= 2;
-        scaledScreenWidth *= 2;
-        scaledScreenHeight *= 2;
-    }
-
-    SDL_VL_Init(title, screenWidth, screenHeight, scaledScreenWidth, scaledScreenHeight, fullscreen);
+    SDL_VL_Init(title, screenWidth, screenHeight, fullscreen);
 
     SDL_VL_SetPaletteColors(gamepal);
     memcpy(curpal, gamepal, sizeof(SDL_Color) * 256);
 
-    screenPitch = g_screen->pitch;
-    bufferPitch = g_indexedScreen->pitch;
+    screenPitch = g_rgbaSurface->pitch;
+    bufferPitch = g_paletteSurface->pitch;
 
-    curSurface = g_indexedScreen;
+    curSurface = g_paletteSurface;
     curPitch = bufferPitch;
 
     scaleFactor = screenWidth / 320;
@@ -235,7 +224,7 @@ void VL_SetPalette(SDL_Color *palette, bool forceupdate)
     memcpy(curpal, palette, sizeof(SDL_Color) * 256);
 
     SDL_VL_SetPaletteColors(palette);
-    SDL_VL_SetSurfacePalette(g_indexedScreen);
+    SDL_VL_SetSurfacePalette(g_paletteSurface);
 
     if (forceupdate)
     {

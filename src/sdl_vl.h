@@ -7,11 +7,10 @@
 
 #include "SDL.h"
 
-extern SDL_Surface *g_screen;
-extern SDL_Surface *g_indexedScreen;
+extern SDL_Surface *g_rgbaSurface;
+extern SDL_Surface *g_paletteSurface;
 
-void SDL_VL_Init(const char *title, uint32_t width, uint32_t height, uint32_t scaledWidth, uint32_t scaledHeight,
-                 bool fullscreen);
+void SDL_VL_Init(const char *title, int originalWidth, int originalHeight, bool fullscreen);
 void SDL_VL_Destroy();
 
 void SDL_VL_SetPaletteColors(SDL_Color *colors);
