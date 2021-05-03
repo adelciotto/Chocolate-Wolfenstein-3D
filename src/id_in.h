@@ -183,6 +183,7 @@ extern bool GameControllerButtons[gcbt_Max];
 extern int GameControllerLeftStick[2];
 extern int GameControllerRightStick[2];
 extern boolean MousePresent;
+extern boolean ModernMouseKeyboard;
 extern volatile boolean Paused;
 extern volatile char LastASCII;
 extern volatile ScanCode LastScan;

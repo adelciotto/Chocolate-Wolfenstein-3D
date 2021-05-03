@@ -29,7 +29,7 @@ void SDL_VL_Init(const char *title, int originalWidth, int originalHeight, bool 
 {
     // Create the SDL Window.
     window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, CRT_SCREEN_WIDTH,
-                              CRT_SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+                              CRT_SCREEN_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
     if (!window)
     {
         Quit("Unable to create SDL_Window %ix%i: %s", CRT_SCREEN_WIDTH, CRT_SCREEN_HEIGHT, SDL_GetError());

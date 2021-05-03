@@ -202,6 +202,12 @@ void PollKeyboardButtons(void)
     for (i = 0; i < NUMBUTTONS; i++)
         if (Keyboard[buttonscan[i]])
             buttonstate[i] = true;
+
+    if (ModernMouseKeyboard)
+    {
+        if (Keyboard[sc_E])
+            buttonstate[bt_use] = true;
+    }
 }
 
 /*
@@ -277,14 +283,31 @@ void PollKeyboardMove(void)
 {
     int delta = buttonstate[bt_run] ? RUNMOVE * tics : BASEMOVE * tics;
 
-    if (Keyboard[dirscan[di_north]])
-        controly -= delta;
-    if (Keyboard[dirscan[di_south]])
-        controly += delta;
-    if (Keyboard[dirscan[di_west]])
-        controlx -= delta;
-    if (Keyboard[dirscan[di_east]])
-        controlx += delta;
+    if (ModernMouseKeyboard)
+    {
+        if (Keyboard[sc_W])
+            controly -= delta;
+        if (Keyboard[sc_S])
+            controly += delta;
+
+        if (Keyboard[sc_A])
+            controlstrafe -= delta;
+        if (Keyboard[sc_D])
+            controlstrafe += delta;
+    }
+    else
+    {
+        if (Keyboard[dirscan[di_north]])
+            controly -= delta;
+        if (Keyboard[dirscan[di_south]])
+            controly += delta;
+
+        if (Keyboard[dirscan[di_west]])
+            controlx -= delta;
+        if (Keyboard[dirscan[di_east]])
+            controlx += delta;
+    }
+
 }
 
 /*
@@ -328,8 +351,16 @@ void PollMouseMove(void)
     int mousexmove, mouseymove;
     SDL_GetRelativeMouseState(&mousexmove, &mouseymove);
 
-    controlx += mousexmove * 10 / (13 - mouseadjustment);
-    controly += mouseymove * 20 / (13 - mouseadjustment);
+    if (ModernMouseKeyboard)
+    {
+        controlx += mousexmove * 20 / (21 - mouseadjustment);
+    }
+    else
+    {
+        controlx += mousexmove * 10 / (13 - mouseadjustment);
+        controly += mouseymove * 20 / (13 - mouseadjustment);
+    }
+
 }
 
 /*
@@ -457,18 +488,25 @@ void PollControls(void)
     //
     // bound movement to a maximum
     //
+    if (!ModernMouseKeyboard)
+    {
+        max = 100 * tics;
+        min = -max;
+        if (controlx > max)
+            controlx = max;
+        else if (controlx < min)
+            controlx = min;
+    }
+
     max = 100 * tics;
     min = -max;
-    if (controlx > max)
-        controlx = max;
-    else if (controlx < min)
-        controlx = min;
-
     if (controly > max)
         controly = max;
     else if (controly < min)
         controly = min;
 
+    max = 100 * tics;
+    min = -max;
     if (controlstrafe > max)
         controlstrafe = max;
     else if (controlstrafe < min)
@@ -1230,8 +1268,6 @@ void PlayLoop(void)
 
     do
     {
-        PollControls();
-
         //
         // actor thinking
         //
@@ -1288,6 +1324,11 @@ void PlayLoop(void)
                 playstate = ex_abort;
             }
         }
+
+        // Ensure that control is only given to the player once the screen has fully faded in.
+        if (!screenfaded || !fizzlein)
+            PollControls();
+
     } while (!playstate && !startgame);
 
     if (playstate != ex_died)

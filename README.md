@@ -9,11 +9,11 @@ other small changes.
 * Enhanced 640x400 display resolution which scales up to any screen size.
 * Corrects the aspect ratio to 4:3 (640x480) to emulate what gamers experienced in 1993.
 * Support for modern game controllers (Xbox, PS3/PS4, etc) via the SDL2 GameController API.
-    * When using a modern game controller, the game supports moving and strafing at the same time.
+* Modern keyboard and mouse controls (WASD movement, mouse to turn).
+    * When using a modern game controller or keyboard/mouse, the game supports moving and strafing at the same time.
 * Using CMake for cross-platform builds.
 
 This is still a WIP. Things I'm planning to do:
-- [ ] Modern keyboard and mouse controls (WASD movement, mouse to turn).
 - [ ] Emulation of DOS launcher for Spear of Destiny which allows you to select episode.
 - [ ] Package Wolf3D and SOD for all pc platforms via CMake.
 - [ ] Configure graphics from the in-game menu (fullscreen, video scale, etc).

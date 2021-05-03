@@ -181,13 +181,14 @@ void ControlMovement(objtype *ob)
             Thrust(angle, BASEMOVE * MOVESCALE * tics);
     }
 
+    // controlstrafe value is only set by modern control schemes (game controller, modern keyboard/mouse).
     if (controlstrafe < 0)
     {
         angle = ob->angle + ANGLES / 4;
         if (angle >= ANGLES)
             angle -= ANGLES;
 
-        int32_t speed = -controlstrafe * MOVESCALE;
+        int32_t speed = -controlstrafe * BACKMOVESCALE;
         if (controly != 0)
             speed = (speed * 70) / 100; // correct faster diagonal movement
         Thrust(angle, speed);           // move to left
@@ -198,7 +199,7 @@ void ControlMovement(objtype *ob)
         if (angle < 0)
             angle += ANGLES;
 
-        int32_t speed = controlstrafe * MOVESCALE;
+        int32_t speed = controlstrafe * BACKMOVESCALE;
         if (controly != 0)
             speed = (speed * 70) / 100; // correct faster diagonal movement
         Thrust(angle, speed);           // move to right

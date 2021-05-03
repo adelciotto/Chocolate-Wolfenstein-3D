@@ -31,7 +31,8 @@
 // configuration variables
 //
 boolean MousePresent;
-boolean forcegrabmouse;
+boolean ModernMouseKeyboard = true;
+boolean forcegrabmouse = ModernMouseKeyboard;
 
 //  Global variables
 volatile boolean Keyboard[SDL_NUM_SCANCODES];
