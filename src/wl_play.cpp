@@ -307,7 +307,6 @@ void PollKeyboardMove(void)
         if (Keyboard[dirscan[di_east]])
             controlx += delta;
     }
-
 }
 
 /*
@@ -360,7 +359,6 @@ void PollMouseMove(void)
         controlx += mousexmove * 10 / (13 - mouseadjustment);
         controly += mouseymove * 20 / (13 - mouseadjustment);
     }
-
 }
 
 /*
