@@ -344,6 +344,8 @@ void PollGameControllerMove(void)
 =
 ===================
 */
+static const int mouseThreshold = 10;
+static const float mouseAccel = 1.0f;
 
 void PollMouseMove(void)
 {
@@ -352,7 +354,11 @@ void PollMouseMove(void)
 
     if (ModernMouseKeyboard)
     {
-        controlx += mousexmove * 20 / (21 - mouseadjustment);
+        if (abs(mousexmove) > mouseThreshold)
+        {
+            mousexmove = (int)((mousexmove - mouseThreshold) * mouseAccel + mouseThreshold);
+            controlx += mousexmove * 20 / (21 - mouseadjustment);
+        }
     }
     else
     {
